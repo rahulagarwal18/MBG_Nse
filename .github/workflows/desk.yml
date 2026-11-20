@@ -1,0 +1,21 @@
+name: desk-heartbeat
+
+on:
+  schedule:
+    # every 15 minutes, Mon–Fri, 03:00–10:59 UTC (covers 09:15–15:30 IST)
+    - cron: "*/15 3-10 * * 1-5"
+  workflow_dispatch: {}
+
+concurrency:
+  group: desk
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Run one cycle
+        run: |
+          curl -fsS --max-time 90 -H "x-desk-key: ${{ secrets.DESK_KEY }}" "${{ secrets.DESK_URL }}/api/tick" || \
+          (sleep 20 && curl -fsS --max-time 90 -H "x-desk-key: ${{ secrets.DESK_KEY }}" "${{ secrets.DESK_URL }}/api/tick")

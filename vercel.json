@@ -1,13 +1,31 @@
 {
-  "regions": ["bom1"],
+  "regions": [
+    "bom1"
+  ],
   "outputDirectory": "public",
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
       ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/tick",
+      "schedule": "*/15 3-10 * * 1-5"
+    },
+    {
+      "path": "/api/tick?at=squareoff",
+      "schedule": "50 9 * * 1-5"
     }
   ]
 }

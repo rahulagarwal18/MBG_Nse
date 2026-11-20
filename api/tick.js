@@ -4,7 +4,8 @@ export const config = { maxDuration: 60 };
 
 export default async function handler(req, res) {
   const key = req.headers['x-desk-key'] || req.query.key;
-  if (!process.env.TICK_SECRET || key !== process.env.TICK_SECRET) {
+  const cron = process.env.CRON_SECRET && req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
+  if (!cron && (!process.env.TICK_SECRET || key !== process.env.TICK_SECRET)) {
     return res.status(401).json({ ok: false, error: 'unauthorized' });
   }
   try {

@@ -847,6 +847,10 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     await load();
   });
 
+  // Keep the desk alive: if a scheduled cycle is overdue, this nudges it (rate-limited on the server).
+  const nudge = () => { if (!document.hidden) fetch('/api/heartbeat').catch(() => {}); };
+  setTimeout(nudge, 4000); setInterval(nudge, 60000);
+
   // Open dashboards pick up new versions automatically.
   let pageTag = null;
   const pageVersion = async () => {

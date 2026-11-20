@@ -145,12 +145,17 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
 .appr-b{display:flex;gap:8px;flex-wrap:wrap}
 .btn{border:none;border-radius:10px;padding:9px 16px;font:700 13.5px "Inter Tight",sans-serif;cursor:pointer}
 .btn.ok{background:var(--green);color:#fff} .btn.no{background:var(--chip);color:var(--ink)} .btn:disabled{opacity:.5;cursor:wait}
+.why{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.why-h{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.why ul{margin:0;padding-left:18px;font-size:13px;line-height:1.5;color:var(--ink2)} .why li{margin:3px 0}
+.why-risk{margin-top:8px;font-size:12.5px;color:var(--amber)}
 .flash{border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:13.5px;font-weight:600}
 .flash.ok{background:var(--green-bg);color:var(--green)} .flash.err{background:var(--red-bg);color:var(--red)}
 .dec{display:flex;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line);color:var(--ink2)} .dec:last-child{border-bottom:none}
 .dec b{color:var(--ink)} .dec time{margin-left:auto;font:500 11px "JetBrains Mono",monospace;color:var(--mute);white-space:nowrap}
 dialog#pinDlg{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--paper);color:var(--ink);width:min(360px,calc(100vw - 32px));box-shadow:var(--shadow)}
 dialog#pinDlg::backdrop{background:rgba(5,13,34,.55)}
+dialog#pinDlg input[type=text]{width:100%;font:600 16px "Inter Tight",sans-serif;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:14px 0 0}
 dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",monospace;letter-spacing:.3em;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:12px 0}
 @media (max-width:1000px){.duo{grid-template-columns:1fr}}
 .banner{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:14px;color:var(--ink2);box-shadow:var(--shadow)}
@@ -243,15 +248,16 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
         </div>
       </div>
       <div class="card">
-        <div class="hd"><h3>✋ Trades waiting for your approval</h3><span class="tag" id="apprCount">0</span></div>
+        <div class="hd"><h3>✋ Recommended trades · waiting for your approval</h3><span class="tag" id="apprCount">0</span></div>
         <div class="bd" id="apprBody"><div class="empty">Loading…</div></div>
         <div class="bd" style="border-top:1px solid var(--line)"><div class="eyebrow" style="margin-bottom:6px">Recent decisions</div><div id="decBody"><div style="color:var(--mute);font-size:13px">No decisions yet.</div></div></div>
       </div>
     </div>
     <dialog id="pinDlg"><form method="dialog" id="pinForm">
-      <h3 style="margin:0;font-size:18px">Approver PIN</h3>
-      <div style="color:var(--mute);font-size:13px;margin-top:4px">Only people with the approver PIN can approve or reject trades.</div>
-      <input type="password" id="pinIn" inputmode="numeric" autocomplete="off" maxlength="12" required>
+      <h3 style="margin:0;font-size:18px">Who is approving?</h3>
+      <div style="color:var(--mute);font-size:13px;margin-top:4px">Your name is recorded with every decision. Only people with the approver PIN can approve or reject trades.</div>
+      <input type="text" id="nameIn" placeholder="Your name" maxlength="40" autocomplete="name" required>
+      <input type="password" id="pinIn" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="PIN" required>
       <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink2)"><input type="checkbox" id="pinRem" checked> Remember on this device</label>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn no" value="cancel" formnovalidate>Cancel</button><button class="btn ok" value="ok" id="pinOk" style="background:var(--accent)">Continue</button></div>
     </form></dialog>
@@ -568,7 +574,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
       const pnl = (px - p.entry) * p.qty;
       const lo = p.initStop, hi = p.target, f = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
       const stage = p.stage === 'breakeven' ? '<span class="tag b">BE</span>' : p.stage === 'trailing' ? '<span class="tag b">TRAIL</span>' : '';
-      return `<tr><td><span class="sym">${esc(p.sym)}</span> <span class="tag g">+${fmt(p.gap)}%</span> ${stage}</td>
+      return `<tr><td><span class="sym">${esc(p.sym)}</span> <span class="tag g">+${fmt(p.gap)}%</span> ${stage}${p.approvedBy ? ` <span class="tag b">✓ ${esc(p.approvedBy)}</span>` : ''}</td>
         <td>${p.qty}</td><td>${usd(p.entry)}</td><td>${usd(px)}</td><td>${usd(p.stop)}</td><td>${usd(p.target)}</td>
         <td><div class="rbar" title="stop → target"><i style="left:0;width:${f(p.entry)}%;background:color-mix(in srgb,var(--red) 30%,transparent)"></i><i style="left:${f(Math.min(px, p.entry))}%;width:${Math.abs(f(px) - f(p.entry))}%;background:${px >= p.entry ? 'var(--green)' : 'var(--red)'}"></i></div></td>
         <td class="${cls(pnl)}"><b>${sgnUsd(pnl)}</b></td></tr>`;
@@ -765,6 +771,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
         return `<div class="appr">
           <div class="appr-h"><b>${esc(p.sym)}</b><span class="tag g">+${fmt(p.gap)}% today</span><span class="appr-exp">⏱ ${left > 60 ? Math.floor(left / 60) + ' min left' : 'expiring'}</span></div>
           <div class="appr-g">Buy ${(p.qty ?? p.shares)} @ ~${usd(p.entry)} · Stop ${usd(p.stop)} · Target ${usd(p.target)}<br>Money used ${usd(p.value, 0)} · Max loss if stopped ${usd(p.risk, 0)}${(state.fx || 1) !== 1 ? ` (${dol(p.risk / state.fx, 0)})` : ''}</div>
+          ${p.reasons?.length ? `<div class="why"><div class="why-h">Why the system recommends this</div><ul>${p.reasons.map(r => `<li>${esc(r)}</li>`).join('')}</ul><div class="why-risk">⚠️ Things to know: gap-up trades can reverse quickly${report ? `. In the replay of the last ${report.sessions} sessions these rules won ${fmt(report.winRate, 0)}% of trades and ${report.totalPct >= 0 ? 'made' : 'lost'} ${fmt(Math.abs(report.totalPct))}% overall` : ''}. Approve only if you accept the maximum loss above.</div></div>` : ''}
           <div class="appr-b"><button class="btn ok" data-id="${esc(p.id)}" data-act="approve">✓ Approve &amp; buy</button><button class="btn no" data-id="${esc(p.id)}" data-act="reject">✕ Reject</button></div>
         </div>`;
       }).join('');
@@ -772,29 +779,32 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     const dec = (state.decisions || []).slice(0, 6);
     $('#decBody').innerHTML = dec.length ? dec.map(d => {
       const ic = d.status === 'approved' ? '✅' : d.status === 'rejected' ? '⛔' : '⌛';
-      const txt = d.status === 'approved' ? `approved · bought ${d.qty ?? d.shares} @ ${usd(d.fill)}` : d.status === 'rejected' ? 'rejected' : `expired · ${esc(d.note || '')}`;
+      const who = d.by ? ` by ${esc(d.by)}` : '';
+      const txt = d.status === 'approved' ? `approved${who} · bought ${d.qty ?? d.shares} @ ${usd(d.fill)}` : d.status === 'rejected' ? `rejected${who}` : `expired · ${esc(d.note || '')}`;
       return `<div class="dec">${ic} <span><b>${esc(d.sym)}</b> ${txt}</span><time>${etFmt.format(d.decidedAt * 1000)}</time></div>`;
     }).join('') : '<div style="color:var(--mute);font-size:13px">No decisions yet.</div>';
   }
-  const PINKEY = 'approverPin';
+  const PINKEY = 'approverPin', NAMEKEY = 'approverName';
   const getPin = () => new Promise(resolve => {
-    try { const s = localStorage.getItem(PINKEY); if (s) return resolve(s); } catch {}
-    const dlg = $('#pinDlg'); $('#pinIn').value = '';
+    let sp = null, sn = '';
+    try { sp = localStorage.getItem(PINKEY); sn = localStorage.getItem(NAMEKEY) || ''; } catch {}
+    if (sp && sn) return resolve({ pin: sp, name: sn });
+    const dlg = $('#pinDlg'); $('#pinIn').value = ''; $('#nameIn').value = sn;
     dlg.onclose = () => {
-      if (dlg.returnValue !== 'ok' || !$('#pinIn').value) return resolve(null);
-      const v = $('#pinIn').value.trim();
-      if ($('#pinRem').checked) { try { localStorage.setItem(PINKEY, v); } catch {} }
-      resolve(v);
+      const pin = $('#pinIn').value.trim(), name = $('#nameIn').value.trim();
+      if (dlg.returnValue !== 'ok' || !pin || !name) return resolve(null);
+      try { localStorage.setItem(NAMEKEY, name); if ($('#pinRem').checked) localStorage.setItem(PINKEY, pin); } catch {}
+      resolve({ pin, name });
     };
-    dlg.showModal(); setTimeout(() => $('#pinIn').focus(), 50);
+    dlg.showModal(); setTimeout(() => (sn ? $('#pinIn') : $('#nameIn')).focus(), 50);
   });
   $('#apprBody').addEventListener('click', async e => {
     const b = e.target.closest('button[data-act]'); if (!b) return;
-    const pin = await getPin(); if (!pin) return;
+    const cred = await getPin(); if (!cred) return;
     document.querySelectorAll('#apprBody button').forEach(x => x.disabled = true);
     b.textContent = b.dataset.act === 'approve' ? 'Checking live price…' : 'Rejecting…';
     try {
-      const r = await fetch('/api/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: b.dataset.id, action: b.dataset.act, pin }) });
+      const r = await fetch('/api/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: b.dataset.id, action: b.dataset.act, pin: cred.pin, by: cred.name }) });
       const j = await r.json().catch(() => ({}));
       if (r.status === 401) { try { localStorage.removeItem(PINKEY); } catch {} }
       flash = { ok: !!j.ok, text: j.message || j.error || 'Something went wrong.', at: Date.now() };

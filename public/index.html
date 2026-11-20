@@ -490,7 +490,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     } catch (e) { $('#mText').textContent = 'Reconnecting…'; }
   }
   let marksAt = 0, marksAsOf = 0, fastBusy = false;
-  const TZ = etFmt.resolvedOptions().timeZone, TZL = TZ === 'Asia/Kolkata' ? ' IST' : ' ET';
+  const TZ = etFmt.resolvedOptions().timeZone, TZL = /Kolkata|Calcutta/.test(TZ) ? ' IST' : ' ET';
   const secFmt = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   async function loadMarks() {
     const syms = (last?.state?.positions || []).map(p => p.sym);
@@ -560,7 +560,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     $('#kWinS').textContent = `${wins} of ${state.trades.length} trades`;
     $('#kOpen').textContent = `${state.positions.length}/${config.maxPositions}`;
     $('#kOpenS').textContent = state.positions.length ? `open P&L ${sgnUsd(unreal)}` : 'flat';
-    $('#kDD').textContent = fmt(dd) + '%';
+    $('#kDD').textContent = fmt(dd) + '%'; $('#kDDS').textContent = 'peak to trough';
 
     // equity curve
     const pts = [...state.equity];
@@ -811,6 +811,18 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     } catch (err) { flash = { ok: false, text: 'Network error. Please try again.', at: Date.now() }; }
     await load();
   });
+
+  // Open dashboards pick up new versions automatically.
+  let pageTag = null;
+  const pageVersion = async () => {
+    try { const r = await fetch('/?v=' + Date.now(), { method: 'HEAD', cache: 'no-store' }); return r.headers.get('etag') || r.headers.get('last-modified'); } catch { return null; }
+  };
+  pageVersion().then(t => { pageTag = t; });
+  setInterval(async () => {
+    if (document.hidden || $('#pinDlg')?.open) return;
+    const t = await pageVersion();
+    if (pageTag && t && t !== pageTag) location.reload();
+  }, 120000);
 
   function ago(ts) {
     const s = Math.max(0, Date.now() / 1000 - ts);

@@ -134,6 +134,8 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
 .demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px;margin-top:14px}
 .demo-grid b{font-size:17px;font-weight:800}
 .demo-up{color:#5ef2b6} .demo-dn{color:#ff9c9c}
+.demo-live{font:500 11.5px/1.5 "JetBrains Mono",monospace;color:rgba(255,255,255,.78);margin-top:4px}
+.demo-live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5ef2b6;margin-right:7px;vertical-align:middle;animation:pulse 1.8s infinite}
 .demo-note{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.72);border-top:1px solid rgba(255,255,255,.14);padding-top:10px}
 .appr{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:var(--bg)}
 .appr-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -230,6 +232,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
         <div class="bd">
           <div class="demo-top"><div><div class="l">Started with</div><div class="v" id="dStart">$10,000.00</div></div><div class="arrow">→</div><div><div class="l">Worth now</div><div class="now" id="dNow">—</div></div></div>
           <div class="demo-pnl" id="dPnl">—</div>
+          <div class="demo-live" id="dLive"><i></i>Live</div>
           <div class="demo-grid">
             <div><div class="l">Booked profit / loss</div><b id="dReal">—</b></div>
             <div><div class="l">Open trades now</div><b id="dOpen">—</b></div>
@@ -480,11 +483,31 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
       render(last);
     } catch (e) { $('#mText').textContent = 'Reconnecting…'; }
   }
+  let marksAt = 0, marksAsOf = 0, fastBusy = false;
+  const TZ = etFmt.resolvedOptions().timeZone, TZL = TZ === 'Asia/Kolkata' ? ' IST' : ' ET';
+  const secFmt = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   async function loadMarks() {
     const syms = (last?.state?.positions || []).map(p => p.sym);
-    if (!syms.length) { marks = {}; return; }
-    try { marks = await (await fetch('/api/quotes?symbols=' + syms.join(','))).json(); } catch {}
+    if (!syms.length) { marks = {}; marksAt = Date.now(); marksAsOf = 0; return; }
+    try {
+      const m = await (await fetch('/api/quotes?symbols=' + encodeURIComponent(syms.join(',')) + '&t=' + Math.floor(Date.now() / 3000))).json();
+      if (m && !m.error) { marks = m; marksAt = Date.now(); marksAsOf = Math.max(0, ...Object.values(m).map(q => q.time || 0)); }
+    } catch {}
   }
+  function updLive() {
+    const el = $('#dLive'); if (!el || !last) return;
+    const n = last.state.positions.length;
+    if (!n) { el.innerHTML = '<i></i>Live · no open trades · value updates the moment a trade fills or closes'; $('#posNote').textContent = 'live marks'; return; }
+    const sec = Math.max(0, Math.round((Date.now() - marksAt) / 1000));
+    el.innerHTML = `<i></i>Live P&L · refreshes every 5 s · updated ${sec}s ago${marksAsOf ? ' · prices as of ' + secFmt.format(marksAsOf * 1000) + TZL : ''}`;
+    $('#posNote').textContent = `live · updated ${sec}s ago`;
+  }
+  setInterval(updLive, 1000);
+  setInterval(async () => {
+    if (fastBusy || document.hidden || !last?.state?.positions?.length) return;
+    fastBusy = true;
+    try { await loadMarks(); render(last); updLive(); } finally { fastBusy = false; }
+  }, 5000);
 
   function render({ state, clock, config }) {
     const now = Date.now() / 1000;

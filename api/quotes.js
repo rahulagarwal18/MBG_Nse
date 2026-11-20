@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (!symbols.length) return res.status(200).json({});
   try {
     const q = await getQuotes(symbols);
-    res.setHeader('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=30');
+    res.setHeader('Cache-Control', 'public, s-maxage=3, stale-while-revalidate=5');
     return res.status(200).json(q);
   } catch (e) {
     return res.status(502).json({ error: String(e?.message || e) });

@@ -484,7 +484,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
         <td>${p.qty}</td><td>${usd(p.entry)}</td><td>${usd(px)}</td><td>${usd(p.stop)}</td><td>${usd(p.target)}</td>
         <td><div class="rbar" title="stop → target"><i style="left:0;width:${f(p.entry)}%;background:color-mix(in srgb,var(--red) 30%,transparent)"></i><i style="left:${f(Math.min(px, p.entry))}%;width:${Math.abs(f(px) - f(p.entry))}%;background:${px >= p.entry ? 'var(--green)' : 'var(--red)'}"></i></div></td>
         <td class="${cls(pnl)}"><b>${sgnUsd(pnl)}</b></td></tr>`;
-    }).join('') : `<tr><td colspan="8" class="empty">${open ? 'Flat. Waiting for the next scan to find gappers.' : `Flat. Every position is squared off by 15:20 IST.`'}</td></tr>`;
+    }).join('') : `<tr><td colspan="8" class="empty">${open ? 'Flat. Waiting for the next scan to find gappers.' : 'Flat. Every position is squared off by 15:20 IST.'}</td></tr>`;
 
     // scan — live scan during the session, otherwise the latest market snapshot
     const liveScan = state.scans[0] && clock?.isOpen && state.scans[0].t >= clock.openTs ? state.scans[0] : null;

@@ -601,6 +601,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
     market_status: {}, get_quotes: { symbols: ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY'] }, scan_gappers: { limit: 10 }, top_movers: { direction: 'gainers', limit: 8 },
     sector_performance: {}, get_history: { symbol: '^NSEI', range: '1mo', interval: '1d' }, search_symbol: { query: 'tata' },
     intraday_charges: { buy_price: 2400, sell_price: 2450, quantity: 100 }, position_size: { entry: 2400, stop: 2340 }, desk_state: { trades: 5 }, strategy_report: {},
+    index_quote: { index: 'NIFTY BANK' }, market_mood: {}, corporate_actions: { symbol: 'INFY' }, week52_range: { symbol: 'HDFCBANK' }, index_valuation: { index: 'Nifty 50' }, data_quality: {},
   };
   let toolsLoaded = false;
   async function loadTools() {

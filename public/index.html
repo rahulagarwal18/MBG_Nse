@@ -686,7 +686,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
   const MCP = location.origin + '/api/mcp';
   const rpc = async (method, params) => (await fetch(MCP, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
     body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }) })).json();
-  const cfgText = JSON.stringify({ mcpServers: { 'nse-desk': { type: 'http', url: MCP } } }, null, 2);
+  const cfgText = JSON.stringify({ mcpServers: { 'multibank-nse': { type: 'http', url: MCP } } }, null, 2);
   $('#mcpUrl').textContent = MCP;
   $('#mcpCfg').textContent = cfgText;
   $('#mcpCurl').textContent = `curl -s ${MCP} \\\n  -H "Content-Type: application/json" \\\n  -H "Accept: application/json, text/event-stream" \\\n  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"market_status","arguments":{}}}'`;

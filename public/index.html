@@ -120,6 +120,29 @@ tr:last-child td{border-bottom:none}
 .note{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;color:var(--ink2);font-size:13.5px;margin-top:16px}
 footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
 .hidden{display:none!important}
+.sr-form{display:flex;gap:10px;flex-wrap:wrap}
+.sr-form input{flex:1;min-width:220px;font:600 16px "Inter Tight",sans-serif;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.sr-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
+#srQuick .chip{cursor:pointer;border:1px solid var(--line)} #srQuick .chip:hover{border-color:var(--accent)}
+.sr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sr-head h2{margin:0;font-size:28px;font-weight:900;letter-spacing:-.02em}
+.sr-price{font-size:34px;font-weight:900;letter-spacing:-.03em;text-align:right}
+.sr-k{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}
+.sr-k > div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.sr-k .l{font:500 10px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.sr-k .v{font-size:19px;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-k .s{font-size:11.5px;color:var(--mute)}
+.sr-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px} .sr-grid > *{min-width:0}
+.sr-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:6px}
+.sr-legend i{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.sr-out{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.sr-ai{white-space:pre-wrap;font-size:14px;line-height:1.6;color:var(--ink2)}
+.sr-ai b{display:block;color:var(--ink);font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 2px}
+.sr-acc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.sr-acc > div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.sr-acc .v{font-size:22px;font-weight:900}
+@media (max-width:1000px){.sr-k{grid-template-columns:repeat(3,1fr)}.sr-grid{grid-template-columns:1fr}}
+@media (max-width:600px){.sr-k{grid-template-columns:repeat(2,1fr)}.sr-acc{grid-template-columns:1fr}}
 .duo{display:grid;grid-template-columns:1fr 1.35fr;gap:16px;margin-bottom:16px}
 .duo > *{min-width:0}
 .demo{background:linear-gradient(135deg,var(--navy),color-mix(in srgb,var(--accent) 70%,var(--navy)));color:#fff;border:none}
@@ -223,6 +246,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
 
   <nav class="tabs" role="tablist">
     <button class="tab on" data-tab="live">Live desk</button>
+    <button class="tab" data-tab="stock">Stock report</button>
     <button class="tab" data-tab="report">Strategy report</button>
     <button class="tab" data-tab="rules">Rules</button>
     <button class="tab" data-tab="connect">Connect · MCP</button>
@@ -273,7 +297,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     <div class="pipeline" id="pipe">
       <div class="step" data-s="1"><div class="n">1</div><b>Scan the market</b><small>NIFTY 500 · 501 symbols</small></div>
       <div class="step" data-s="2"><div class="n">2</div><b>Pull live quotes</b><small>batched, every tick</small></div>
-      <div class="step" data-s="3"><div class="n">3</div><b>Filter gappers</b><small>+2.5% and holding</small></div>
+      <div class="step" data-s="3"><div class="n">3</div><b>Filter gappers</b><small>+2% and holding</small></div>
       <div class="step" data-s="4"><div class="n">4</div><b>You approve</b><small>then it executes</small></div>
       <div class="step" data-s="5"><div class="n">5</div><b>Repeat</b><small id="nextScan">every 30 min</small></div>
     </div>
@@ -314,6 +338,16 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     </div>
   </main>
 
+  <!-- STOCK REPORT -->
+  <section id="tab-stock" class="hidden">
+    <div class="card" style="margin-bottom:16px"><div class="bd">
+      <div class="eyebrow" style="margin-bottom:10px">Stock report · last 30 days + 5-day projection</div>
+      <form id="srForm" class="sr-form"><input id="srIn" list="srList" placeholder="Type a company or symbol, e.g. RELIANCE or Tata" autocomplete="off" spellcheck="false"><datalist id="srList"></datalist><button class="btn ok" style="background:var(--accent)">Get report</button></form>
+      <div class="chips" id="srQuick" style="margin-top:10px"></div>
+    </div></div>
+    <div id="srOut"><div class="empty" style="padding:40px 10px">Pick a stock to see what it did in the last 30 days, where it may trade over the next 5 days, and how reliable that projection has been.</div></div>
+  </section>
+
   <!-- REPORT -->
   <section id="tab-report" class="hidden">
     <div class="hero" style="border-top:none;padding-top:0">
@@ -347,7 +381,7 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     <div class="rules" id="rulesGrid"></div>
     <div class="note">
       <b>Human approval.</b> Every new trade is proposed first and only executed after a person approves it with the approver PIN. The live price is re-checked at the moment of approval; if it has run more than 1% away or hit the stop, the trade is not placed. A proposal nobody decides on expires at the next scan. Stops, targets and the closing exit stay automatic because they protect capital.<br><br>
-      <b>How a day runs.</b> At 09:40 IST the desk pulls live quotes for all NIFTY 500 stocks and keeps only the ones that opened at least 1.5% above the previous close, are up 2.5% or more, and are still holding above the open. The strongest names are bought (intraday) with a stop under the day’s low (2–5% away), sized so a stop-out costs 1% of capital, with no position above 20% of capital. At +1R the stop moves to breakeven; past +2R it trails 1R behind price; at +3R the target books profit. The scan repeats every 30 minutes, no new entries after 14:30, and everything is squared off by 15:20 IST, before the broker’s auto square-off. Every P&amp;L figure is net of brokerage, STT, exchange and SEBI fees, stamp duty and GST.
+      <b>How a day runs.</b> At 09:40 IST the desk pulls live quotes for all NIFTY 500 stocks and keeps only the ones that opened at least 1% above the previous close, are up 2% or more, and are still holding above the open. The strongest names are bought (intraday) with a stop under the day’s low (2–5% away), sized so a stop-out costs 1% of capital, with no position above 20% of capital. At +1R the stop moves to breakeven; past +2R it trails 1R behind price; at +3R the target books profit. The scan repeats every 30 minutes, no new entries after 14:30, and everything is squared off by 15:20 IST, before the broker’s auto square-off. Every P&amp;L figure is net of brokerage, STT, exchange and SEBI fees, stamp duty and GST.
     </div>
   </section>
 
@@ -423,8 +457,9 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
   let report = null;
   document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
-    ['live', 'report', 'rules', 'connect'].forEach(k => $('#tab-' + k).classList.toggle('hidden', k !== b.dataset.tab));
+    ['live', 'stock', 'report', 'rules', 'connect'].forEach(k => $('#tab-' + k).classList.toggle('hidden', k !== b.dataset.tab));
     if (b.dataset.tab === 'report' && !report) loadReport();
+    if (b.dataset.tab === 'stock') srInit();
     if (b.dataset.tab === 'connect') loadTools();
     try { localStorage.setItem('tab', b.dataset.tab); } catch {}
   });
@@ -823,6 +858,106 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     const t = await pageVersion();
     if (pageTag && t && t !== pageTag) location.reload();
   }, 120000);
+
+
+  // ---- Stock report
+  let srReady = false, srBusy = false;
+  async function srInit() {
+    if (srReady) return; srReady = true;
+    const held = (last?.state?.positions || []).map(p => p.sym);
+    const quick = [...new Set([...held, ...['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN']])].slice(0, 8);
+    $('#srQuick').innerHTML = quick.map(s => `<span class="chip" data-s="${esc(s)}"><b>${esc(s)}</b></span>`).join('');
+    $('#srQuick').onclick = e => { const c = e.target.closest('[data-s]'); if (c) { $('#srIn').value = c.dataset.s; srRun(c.dataset.s); } };
+    $('#srForm').onsubmit = e => { e.preventDefault(); const v = $('#srIn').value.trim().split(/[\s—–-]+/)[0]; if (v) srRun(v); };
+    try {
+      const list = await (await fetch('/api/symbols')).json();
+      $('#srList').innerHTML = list.map(x => `<option value="${esc(x.s)}">${x.n ? esc(x.n) : ''}</option>`).join('');
+    } catch {}
+  }
+  async function srRun(sym) {
+    if (srBusy) return; srBusy = true;
+    sym = sym.toUpperCase();
+    $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="empty" style="padding:40px 10px">Building the report for <b>${esc(sym)}</b>: one year of prices, 30-day analysis, 5-day projection and its accuracy check…</div></div></div>`;
+    try {
+      const r = await fetch('/api/analyze?symbol=' + encodeURIComponent(sym));
+      const d = await r.json();
+      if (!r.ok || d.error) throw new Error(d.error || 'Report failed');
+      srRender(d);
+    } catch (e) {
+      $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="flash err">${esc(e.message)}</div></div></div>`;
+    } finally { srBusy = false; }
+  }
+  function srChart(el, hist, fc) {
+    const css = getComputedStyle(document.documentElement);
+    const acc = css.getPropertyValue('--accent').trim(), line = css.getPropertyValue('--line').trim(), mute = css.getPropertyValue('--mute').trim(), amber = css.getPropertyValue('--amber').trim();
+    const W = el.clientWidth || 700, H = 300, pl = 8, pr = 74, pt = 12, pb = 28;
+    const N = hist.length + fc.length;
+    const vals = [...hist.map(h => h.close), ...fc.flatMap(f => [f.low95, f.high95])];
+    let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
+    const x = i => pl + i / (N - 1) * (W - pl - pr), y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+    const L = hist.length - 1, last = hist[L].close;
+    const band = (a, b) => `M${x(L)},${y(last)} ` + fc.map((f, k) => `L${x(L + 1 + k)},${y(f[a])}`).join(' ') + ' ' + fc.map((f, k) => `L${x(L + fc.length - k)},${y(fc[fc.length - 1 - k][b])}`).join(' ') + ` L${x(L)},${y(last)} Z`;
+    let g = '';
+    for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${line}" stroke-dasharray="2 4"/><text x="${W - pr + 8}" y="${yy + 4}" fill="${mute}" font-size="11" font-family="JetBrains Mono">${fmt(v, v < 100 ? 2 : 0)}</text>`; }
+    const lbl = (i, t, a) => `<text x="${x(i)}" y="${H - 8}" fill="${mute}" font-size="11" font-family="JetBrains Mono" text-anchor="${a}">${t}</text>`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">${g}
+      <rect x="${x(L)}" y="${pt}" width="${x(N - 1) - x(L)}" height="${H - pt - pb}" fill="${acc}" opacity=".05"/>
+      <path d="${band('low95', 'high95')}" fill="${amber}" opacity=".16"/><path d="${band('low68', 'high68')}" fill="${amber}" opacity=".32"/>
+      <path d="M${x(L)},${y(last)} ${fc.map((f, k) => `L${x(L + 1 + k)},${y(f.expected)}`).join(' ')}" fill="none" stroke="${amber}" stroke-width="2.2" stroke-dasharray="6 5"/>
+      <path d="${hist.map((h, i) => `${i ? 'L' : 'M'}${x(i)},${y(h.close)}`).join('')}" fill="none" stroke="${acc}" stroke-width="2.4" stroke-linejoin="round"/>
+      <circle cx="${x(L)}" cy="${y(last)}" r="4.5" fill="${acc}"/>
+      ${lbl(0, hist[0].date.slice(5), 'start')}${lbl(L, 'today', 'middle')}${lbl(N - 1, fc[fc.length - 1].date.slice(5), 'end')}
+      <text x="${x(L) + 6}" y="${pt + 14}" fill="${mute}" font-size="11" font-family="JetBrains Mono">next 5 days →</text></svg>`;
+  }
+  function srRender(d) {
+    const m = d.metrics, a = d.accuracy, f5 = d.forecast[d.forecast.length - 1];
+    const rsiTxt = m.rsi14 >= 70 ? 'overbought: rose fast, often cools off' : m.rsi14 <= 30 ? 'oversold: fell fast, often bounces' : 'normal range';
+    const trendTxt = { up: 'short-term average above 20-day', down: 'short-term average below 20-day', sideways: 'no clear trend' }[m.trend] || '';
+    const coin = a.directionHitPct == null || a.directionHitPct < 55;
+    $('#srOut').innerHTML = `
+      <div class="card" style="margin-bottom:16px"><div class="bd">
+        <div class="sr-head">
+          <div><div class="eyebrow">${esc(d.symbol)}${d.sector ? ' · ' + esc(d.sector) : ''}</div><h2>${esc(d.name)}</h2></div>
+          <div><div class="sr-price">${usd(d.price)}</div><div class="${cls(d.changePct)}" style="text-align:right;font-weight:800">${d.changePct >= 0 ? '+' : ''}${fmt(d.changePct)}% today <span class="tag" style="margin-left:6px">${esc(d.priceSource)}</span></div></div>
+        </div>
+        <div class="sr-k">
+          <div><div class="l">30-day change</div><div class="v ${cls(m.return30Pct)}">${m.return30Pct >= 0 ? '+' : ''}${fmt(m.return30Pct)}%</div><div class="s">${m.upDays} up · ${m.downDays} down days</div></div>
+          <div><div class="l">30-day range</div><div class="v">${usd(m.low30, 0)}–${usd(m.high30, 0).replace(/^[^0-9]+/, '')}</div><div class="s">lowest – highest</div></div>
+          <div><div class="l">Trend</div><div class="v ${m.trend === 'up' ? 'pos' : m.trend === 'down' ? 'neg' : ''}">${esc(m.trend)}</div><div class="s">${trendTxt}</div></div>
+          <div><div class="l">RSI (14)</div><div class="v">${fmt(m.rsi14, 1)}</div><div class="s">${rsiTxt}</div></div>
+          <div><div class="l">Typical daily move</div><div class="v">±${fmt(m.dailyVolatilityPct)}%</div><div class="s">how jumpy the price is</div></div>
+          <div><div class="l">52-week position</div><div class="v">${fmt(m.positionIn52wPct, 0)}%</div><div class="s">0% = year low, 100% = high</div></div>
+        </div>
+        <div class="sr-grid">
+          <div><div id="srChart"></div>
+            <div class="sr-legend"><span><i style="background:var(--accent)"></i>last 30 days</span><span><i style="background:var(--amber)"></i>expected path</span><span><i style="background:var(--amber);opacity:.5"></i>likely range (68%)</span><span><i style="background:var(--amber);opacity:.25"></i>wide range (95%)</span></div>
+          </div>
+          <div>
+            <div class="eyebrow">Next 5 days · statistical projection</div>
+            <div class="sr-out ${d.outlook === 'leaning up' ? 'pos' : d.outlook === 'leaning down' ? 'neg' : ''}" style="margin:4px 0 8px">${esc(d.outlook[0].toUpperCase() + d.outlook.slice(1))} · ${fmt(d.probUpPct, 0)}% chance higher</div>
+            <div class="tscroll"><table><thead><tr><th>Day</th><th>Expected</th><th>Likely (68%)</th><th>Wide (95%)</th></tr></thead><tbody>
+              ${d.forecast.map(r => `<tr><td>${esc(r.date.slice(5))}</td><td><b>${usd(r.expected)}</b></td><td>${usd(r.low68, 0)}–${usd(r.high68, 0).replace(/^[^0-9]+/, '')}</td><td style="color:var(--mute)">${usd(r.low95, 0)}–${usd(r.high95, 0).replace(/^[^0-9]+/, '')}</td></tr>`).join('')}
+            </tbody></table></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="grid2">
+        <div class="card"><div class="hd"><h3>🧠 Analyst summary</h3><span class="tag ${d.analysisBy === 'ai' ? 'b' : ''}">${d.analysisBy === 'ai' ? 'AI analyst' : 'auto summary'}</span></div>
+          <div class="bd sr-ai">${esc(d.analysis).split('\n').map(l => /^(Last 30 days|Next 5 days \(projection\)|Risks to watch)\s*$/.test(l.trim()) ? `<b>${l.trim()}</b>` : l).join('\n')}</div></div>
+        <div class="card"><div class="hd"><h3>🎯 How reliable is this?</h3><span class="tag">${a.periodsTested} past tests</span></div>
+          <div class="bd">
+            <div style="font-size:13.5px;color:var(--ink2)">The same projection method was replayed on every trading day of the past year for this stock:</div>
+            <div class="sr-acc">
+              <div><div class="l eyebrow">Direction right</div><div class="v">${a.directionHitPct == null ? '—' : fmt(a.directionHitPct, 0) + '%'}</div><div class="s" style="font-size:12px;color:var(--mute)">coin flip = 50%</div></div>
+              <div><div class="l eyebrow">In likely range</div><div class="v">${fmt(a.within68BandPct, 0)}%</div><div class="s" style="font-size:12px;color:var(--mute)">target 68%</div></div>
+              <div><div class="l eyebrow">In wide range</div><div class="v">${fmt(a.within95BandPct, 0)}%</div><div class="s" style="font-size:12px;color:var(--mute)">target 95%</div></div>
+            </div>
+            <div class="why-risk" style="font-size:13px">${coin ? '⚠️ For this stock the up/down call is about as good as a coin flip. Trust the <b>price ranges</b>, not the direction.' : '✅ For this stock the up/down call beat a coin flip over the past year, but it is still often wrong.'} The ranges have been ${Math.abs(a.within68BandPct - 68) <= 6 ? 'well calibrated' : 'only roughly calibrated'}. Nobody can predict prices; this shows likely movement, not certainty.</div>
+          </div></div>
+      </div>
+      <div class="note" style="margin-top:16px;font-size:12.5px"><b>How this is calculated.</b> ${esc(d.method)} The written summary only explains these numbers; it does not add predictions. Not investment advice.</div>`;
+    srChart($('#srChart'), d.history, d.forecast);
+  }
 
   function ago(ts) {
     const s = Math.max(0, Date.now() / 1000 - ts);

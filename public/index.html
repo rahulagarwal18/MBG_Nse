@@ -3,29 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gapline · NSE Desk</title>
+<title>MultiBank Automated Trading · NSE India</title>
 <meta name="description" content="Autonomous NSE intraday desk for the NIFTY 500. Scans, entries, stops and square-offs — live, net of Indian charges.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d63a2f'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b5cff'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f4efe6; --paper:#fbf8f2; --ink:#141312; --ink2:#4a4642; --mute:#8a847c; --line:#e3dccf; --grid:rgba(20,19,18,.045);
-  --red:#d63a2f; --green:#16825d; --green-bg:#e4f3ec; --red-bg:#fbe7e4; --blue:#2f5bd6; --amber:#c98a12; --chip:#efe8db;
-  --shadow:0 1px 0 rgba(20,19,18,.04), 0 8px 24px -12px rgba(20,19,18,.12);
+  --bg:#eef3fb; --paper:#ffffff; --ink:#0a1633; --ink2:#3a4a6b; --mute:#7483a3; --line:#dbe3f0; --grid:rgba(11,60,160,.05);
+  --accent:#0b5cff; --accent2:#00a6ff; --navy:#071a44;
+  --red:#e0434b; --green:#0e9a68; --green-bg:#e3f6ee; --red-bg:#fde9ea; --blue:#0b5cff; --amber:#d08a0c; --chip:#e8eef9;
+  --shadow:0 1px 0 rgba(10,22,51,.04), 0 10px 28px -14px rgba(11,60,160,.22);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#121110; --paper:#1a1918; --ink:#f3efe8; --ink2:#c4bdb2; --mute:#8a847c; --line:#2b2926; --grid:rgba(255,255,255,.035);
-    --red:#ff5a4c; --green:#3ccf91; --green-bg:rgba(60,207,145,.12); --red-bg:rgba(255,90,76,.12); --blue:#7d9bff; --amber:#f0b440; --chip:#24221f;
-    --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+    --bg:#050d22; --paper:#0b1733; --ink:#eaf0ff; --ink2:#b3c1e0; --mute:#7d8cb0; --line:#1b2a4f; --grid:rgba(120,160,255,.05);
+    --accent:#3d7bff; --accent2:#22b8ff; --navy:#020817;
+    --red:#ff6b6b; --green:#2fd398; --green-bg:rgba(47,211,152,.12); --red-bg:rgba(255,107,107,.12); --blue:#6f9bff; --amber:#f0b440; --chip:#13234a;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#121110; --paper:#1a1918; --ink:#f3efe8; --ink2:#c4bdb2; --mute:#8a847c; --line:#2b2926; --grid:rgba(255,255,255,.035);
-  --red:#ff5a4c; --green:#3ccf91; --green-bg:rgba(60,207,145,.12); --red-bg:rgba(255,90,76,.12); --blue:#7d9bff; --amber:#f0b440; --chip:#24221f;
-  --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  --bg:#050d22; --paper:#0b1733; --ink:#eaf0ff; --ink2:#b3c1e0; --mute:#7d8cb0; --line:#1b2a4f; --grid:rgba(120,160,255,.05);
+  --accent:#3d7bff; --accent2:#22b8ff; --navy:#020817;
+  --red:#ff6b6b; --green:#2fd398; --green-bg:rgba(47,211,152,.12); --red-bg:rgba(255,107,107,.12); --blue:#6f9bff; --amber:#f0b440; --chip:#13234a;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -40,7 +43,7 @@ body{
 .wrap{max-width:1240px;margin:0 auto;padding:0 20px 64px}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px}
-.brand .mark{width:34px;height:34px;border-radius:9px;background:var(--red);display:grid;place-items:center}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center}
 .brand b{font-weight:900;letter-spacing:-.02em;font-size:20px}
 .brand span{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
 .status{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -51,19 +54,19 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
 .iconbtn{background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
 
-.hero{display:grid;grid-template-columns:1.2fr 2fr;gap:28px;align-items:end;padding:26px 0 22px;border-top:2px solid var(--ink)}
-.hero .num{font-family:"Instrument Serif",serif;color:var(--red);font-size:88px;line-height:.8;letter-spacing:-.02em}
+.hero{display:grid;grid-template-columns:1.2fr 2fr;gap:28px;align-items:end;padding:26px 0 22px;border-top:2px solid var(--accent)}
+.hero .num{font-family:"Instrument Serif",serif;color:var(--accent);font-size:88px;line-height:.8;letter-spacing:-.02em}
 .hero h1{margin:6px 0 0;font-size:44px;line-height:1;font-weight:900;letter-spacing:-.035em}
 .hero p{margin:0;color:var(--ink2);font-size:17px;max-width:620px}
 .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 
 .tabs{display:flex;gap:6px;margin:6px 0 18px;flex-wrap:wrap}
 .tab{border:1px solid var(--line);background:var(--paper);color:var(--ink2);padding:8px 14px;border-radius:999px;font:600 13px "Inter Tight",sans-serif;cursor:pointer}
-.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
 .kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
-.kpi .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.kpi .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .kpi .v{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .s{font-size:12px;color:var(--mute);margin-top:2px}
 .pos{color:var(--green)} .neg{color:var(--red)}
@@ -80,8 +83,8 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:16p
 .step .n{width:26px;height:26px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;margin-bottom:8px}
 .step b{display:block;font-size:13.5px;letter-spacing:-.01em}
 .step small{display:block;color:var(--mute);font-size:12px;margin-top:2px}
-.step.active{border-color:var(--red);box-shadow:0 0 0 3px color-mix(in srgb,var(--red) 18%,transparent)}
-.step.active .n{background:var(--red);color:#fff}
+.step.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.step.active .n{background:var(--accent);color:#fff}
 
 svg.chart{width:100%;height:260px;display:block}
 .chart-empty{height:260px;display:grid;place-items:center;color:var(--mute);font-size:14px;text-align:center}
@@ -111,17 +114,48 @@ tr:last-child td{border-bottom:none}
 
 .rules{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .rule{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
-.rule .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.rule .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
 .rule .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
 .rule .s{font-size:12px;color:var(--mute)}
 .note{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;color:var(--ink2);font-size:13.5px;margin-top:16px}
 footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
 .hidden{display:none!important}
+.duo{display:grid;grid-template-columns:1fr 1.35fr;gap:16px;margin-bottom:16px}
+.duo > *{min-width:0}
+.demo{background:linear-gradient(135deg,var(--navy),color-mix(in srgb,var(--accent) 70%,var(--navy)));color:#fff;border:none}
+.demo .hd{border-bottom:1px solid rgba(255,255,255,.14)} .demo .hd h3{color:#fff} .demo .tag{background:rgba(255,255,255,.14);color:#fff}
+.demo .l{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65)}
+.demo-top{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.demo-top .v{font-size:22px;font-weight:700;color:rgba(255,255,255,.8)}
+.demo-top .now{font-size:40px;font-weight:900;letter-spacing:-.03em;color:#fff;line-height:1}
+.demo-top .arrow{font-size:22px;color:rgba(255,255,255,.5);padding-bottom:4px}
+.demo-pnl{display:inline-flex;gap:8px;align-items:baseline;margin:14px 0 4px;padding:6px 12px;border-radius:999px;font-weight:800;font-size:16px;background:rgba(255,255,255,.12)}
+.demo-pnl.up{color:#5ef2b6} .demo-pnl.down{color:#ff9c9c}
+.demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px;margin-top:14px}
+.demo-grid b{font-size:17px;font-weight:800}
+.demo-up{color:#5ef2b6} .demo-dn{color:#ff9c9c}
+.demo-note{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.72);border-top:1px solid rgba(255,255,255,.14);padding-top:10px}
+.appr{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:var(--bg)}
+.appr-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.appr-h b{font-size:17px;font-weight:900;letter-spacing:-.01em}
+.appr-exp{margin-left:auto;font:500 11.5px "JetBrains Mono",monospace;color:var(--amber)}
+.appr-g{font:500 12.5px/1.6 "JetBrains Mono",monospace;color:var(--ink2);margin:6px 0 10px}
+.appr-b{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:10px;padding:9px 16px;font:700 13.5px "Inter Tight",sans-serif;cursor:pointer}
+.btn.ok{background:var(--green);color:#fff} .btn.no{background:var(--chip);color:var(--ink)} .btn:disabled{opacity:.5;cursor:wait}
+.flash{border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:13.5px;font-weight:600}
+.flash.ok{background:var(--green-bg);color:var(--green)} .flash.err{background:var(--red-bg);color:var(--red)}
+.dec{display:flex;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line);color:var(--ink2)} .dec:last-child{border-bottom:none}
+.dec b{color:var(--ink)} .dec time{margin-left:auto;font:500 11px "JetBrains Mono",monospace;color:var(--mute);white-space:nowrap}
+dialog#pinDlg{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--paper);color:var(--ink);width:min(360px,calc(100vw - 32px));box-shadow:var(--shadow)}
+dialog#pinDlg::backdrop{background:rgba(5,13,34,.55)}
+dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",monospace;letter-spacing:.3em;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:12px 0}
+@media (max-width:1000px){.duo{grid-template-columns:1fr}}
 .banner{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:14px;color:var(--ink2);box-shadow:var(--shadow)}
 .banner b{color:var(--ink)}
 .code{font:500 12.5px/1.6 "JetBrains Mono",monospace;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;white-space:pre-wrap;word-break:break-all;margin:0;color:var(--ink)}
 .tool{padding:12px 0;border-bottom:1px solid var(--line)} .tool:last-child{border-bottom:none}
-.tool b{font:600 13.5px "JetBrains Mono",monospace;color:var(--red)} .tool p{margin:4px 0 0;color:var(--ink2);font-size:13.5px}
+.tool b{font:600 13.5px "JetBrains Mono",monospace;color:var(--accent)} .tool p{margin:4px 0 0;color:var(--ink2);font-size:13.5px}
 .bars{display:flex;flex-direction:column;gap:7px}
 .barrow{display:grid;grid-template-columns:minmax(0,190px) 1fr 64px;gap:10px;align-items:center;font-size:13px}
 .barrow span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
@@ -159,7 +193,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   <header class="top">
     <div class="brand">
       <div class="mark"><svg width="20" height="20" viewBox="0 0 32 32"><path d="M5 23l7-8 5 4 10-12" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div><b>Gapline <i style="font-style:normal;letter-spacing:.08em;font-size:12px;color:var(--red);font-weight:800;vertical-align:middle">NSE</i></b><span>Autonomous Desk · India</span></div>
+      <div><b>MultiBank Automated Trading <i style="font-style:normal;letter-spacing:.08em;font-size:12px;color:var(--accent);font-weight:800;vertical-align:middle">NSE</i></b><span>India Equities · Human-approved</span></div>
     </div>
     <div class="status">
       <span class="pill"><span class="dot" id="mDot"></span><span id="mText">Connecting…</span></span>
@@ -175,8 +209,8 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       <div class="num">₹ NSE</div>
     </div>
     <div>
-      <h1>It trades by itself.</h1>
-      <p style="margin-top:10px">Scans all NIFTY 500 stocks every 30 minutes from 09:40 IST, buys the gappers with a hard stop, trails its own stops and squares off by 15:20. Every result is shown net of brokerage, STT, GST and stamp duty.</p>
+      <h1>It finds the trades. You approve them.</h1>
+      <p style="margin-top:10px">Scans all NIFTY 500 stocks every 30 minutes from 09:40 IST and proposes the strongest gap-up trades with stop, target and risk already worked out. Nothing is bought until a human approves it. Stops, targets and the 15:20 square-off run automatically, and every result is net of Indian charges.</p>
     </div>
   </section>
 
@@ -190,6 +224,34 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   <!-- LIVE -->
   <main id="tab-live">
     <div class="banner hidden" id="modeBanner"></div>
+    <div class="duo">
+      <div class="card demo">
+        <div class="hd"><h3>💵 $10,000 demo account</h3><span class="tag" id="demoTag">simulated money</span></div>
+        <div class="bd">
+          <div class="demo-top"><div><div class="l">Started with</div><div class="v" id="dStart">$10,000.00</div></div><div class="arrow">→</div><div><div class="l">Worth now</div><div class="now" id="dNow">—</div></div></div>
+          <div class="demo-pnl" id="dPnl">—</div>
+          <div class="demo-grid">
+            <div><div class="l">Booked profit / loss</div><b id="dReal">—</b></div>
+            <div><div class="l">Open trades now</div><b id="dOpen">—</b></div>
+            <div><div class="l">Closed trades · win rate</div><b id="dTr">—</b></div>
+            <div><div class="l">Approved / rejected</div><b id="dAppr">—</b></div>
+          </div>
+          <div class="demo-note" id="dNote"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="hd"><h3>✋ Trades waiting for your approval</h3><span class="tag" id="apprCount">0</span></div>
+        <div class="bd" id="apprBody"><div class="empty">Loading…</div></div>
+        <div class="bd" style="border-top:1px solid var(--line)"><div class="eyebrow" style="margin-bottom:6px">Recent decisions</div><div id="decBody"><div style="color:var(--mute);font-size:13px">No decisions yet.</div></div></div>
+      </div>
+    </div>
+    <dialog id="pinDlg"><form method="dialog" id="pinForm">
+      <h3 style="margin:0;font-size:18px">Approver PIN</h3>
+      <div style="color:var(--mute);font-size:13px;margin-top:4px">Only people with the approver PIN can approve or reject trades.</div>
+      <input type="password" id="pinIn" inputmode="numeric" autocomplete="off" maxlength="12" required>
+      <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink2)"><input type="checkbox" id="pinRem" checked> Remember on this device</label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn no" value="cancel" formnovalidate>Cancel</button><button class="btn ok" value="ok" id="pinOk" style="background:var(--accent)">Continue</button></div>
+    </form></dialog>
     <div class="kpis">
       <div class="kpi"><div class="l">Equity</div><div class="v" id="kEq">—</div><div class="s" id="kEqS">simulated account</div></div>
       <div class="kpi"><div class="l">Today</div><div class="v" id="kDay">—</div><div class="s" id="kDayS">realized + open</div></div>
@@ -203,7 +265,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       <div class="step" data-s="1"><div class="n">1</div><b>Scan the market</b><small>NIFTY 500 · 501 symbols</small></div>
       <div class="step" data-s="2"><div class="n">2</div><b>Pull live quotes</b><small>batched, every tick</small></div>
       <div class="step" data-s="3"><div class="n">3</div><b>Filter gappers</b><small>+2.5% and holding</small></div>
-      <div class="step" data-s="4"><div class="n">4</div><b>Execute</b><small>entry · stop · target</small></div>
+      <div class="step" data-s="4"><div class="n">4</div><b>You approve</b><small>then it executes</small></div>
       <div class="step" data-s="5"><div class="n">5</div><b>Repeat</b><small id="nextScan">every 30 min</small></div>
     </div>
 
@@ -275,6 +337,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   <section id="tab-rules" class="hidden">
     <div class="rules" id="rulesGrid"></div>
     <div class="note">
+      <b>Human approval.</b> Every new trade is proposed first and only executed after a person approves it with the approver PIN. The live price is re-checked at the moment of approval; if it has run more than 1% away or hit the stop, the trade is not placed. A proposal nobody decides on expires at the next scan. Stops, targets and the closing exit stay automatic because they protect capital.<br><br>
       <b>How a day runs.</b> At 09:40 IST the desk pulls live quotes for all NIFTY 500 stocks and keeps only the ones that opened at least 1.5% above the previous close, are up 2.5% or more, and are still holding above the open. The strongest names are bought (intraday) with a stop under the day’s low (2–5% away), sized so a stop-out costs 1% of capital, with no position above 20% of capital. At +1R the stop moves to breakeven; past +2R it trails 1R behind price; at +3R the target books profit. The scan repeats every 30 minutes, no new entries after 14:30, and everything is squared off by 15:20 IST, before the broker’s auto square-off. Every P&amp;L figure is net of brokerage, STT, exchange and SEBI fees, stamp duty and GST.
     </div>
   </section>
@@ -283,7 +346,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   <section id="tab-connect" class="hidden">
     <div class="hero" style="border-top:none;padding-top:0">
       <div><div class="eyebrow">Model Context Protocol</div><div class="num" style="font-size:72px">MCP</div></div>
-      <div><h1 style="font-size:36px">Plug the NSE desk into any AI assistant.</h1>
+      <div><h1 style="font-size:36px">Plug MultiBank Automated Trading into any AI assistant.</h1>
         <p style="margin-top:8px">One endpoint gives any MCP-compatible assistant or agent live NSE data, the NIFTY 500 scanner, sector breadth, price history, Indian charges and position sizing, plus this desk’s live state and strategy report.</p></div>
     </div>
     <div class="grid2">
@@ -319,7 +382,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   </section>
 
   <footer>
-    <span>Paper account on live NSE data (may be delayed). For research and education only. Not investment advice.</span>
+    <span>Prototype · $10,000 simulated demo account on live market data · not an official MultiBank Group service · not investment advice.</span>
     <span class="mono" id="updated"></span>
   </footer>
 </div>
@@ -408,7 +471,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
   let last = null, marks = {}, snap = null, snapAt = 0;
   async function load() {
     try {
-      const jobs = [fetch('/api/state', { cache: 'no-store' }).then(r => r.json())];
+      const jobs = [fetch('/api/state?t=' + Date.now(), { cache: 'no-store' }).then(r => r.json())];
       if (!report) jobs.push(fetch('/api/report').then(r => r.json()).then(j => { if (!j.error) { report = j; renderReport(j); } }).catch(() => {}));
       if (!snap || Date.now() - snapAt > 60000) jobs.push(fetch('/api/scan').then(r => r.json()).then(j => { if (!j.error) { snap = j; snapAt = Date.now(); } }).catch(() => {}));
       const [st] = await Promise.all(jobs);
@@ -572,6 +635,9 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       $('#feed').innerHTML = all.map(e => `<div class="msg ${e.type}">${esc(e.text)}<time>${e.rp ? 'replay · ' : ''}${etDay.format(e.t * 1000)} · ${etFmt.format(e.t * 1000)} IST</time></div>`).join('');
     }
 
+    renderDemo(state, clock, config);
+    renderApprovals(state, clock, config);
+
     // rules
     $('#rulesGrid').innerHTML = [
       ['Universe', 'NIFTY 500', '501 symbols, every scan'],
@@ -579,7 +645,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       ['Gap filter', `+${config.minGapPct}%`, `opened ≥ +${config.minOpenGapPct}%, holding the open`],
       ['Risk / trade', `${config.riskPct}%`, `of capital · max ${config.maxPositionPct}% per stock`],
       ['Stop', `${config.stopMinPct}–${config.stopMaxPct}%`, 'under the day’s low'],
-      ['Breakeven', '+1R', `trail 1R after +2R`],
+      ['Approval', 'Human', 'every buy needs a click · exits automatic'],
       ['Target', `+${config.targetR}R`, `max ${config.maxPositions} open positions`],
       ['Square-off', '15:20 IST', 'intraday, flat every day'],
     ].map(([l, v, s]) => `<div class="rule"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
@@ -628,6 +694,90 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       });
     } catch (e) { toolsLoaded = false; $('#toolList').innerHTML = '<div class="empty">Could not load the tool catalogue.</div>'; }
   }
+
+
+  // ---- $10,000 demo account + human approval
+  const dol = (n, d = 2) => n == null || isNaN(n) ? '—' : (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const sdol = n => (n > 0 ? '+' : '') + dol(n);
+  let flash = null;
+  function renderDemo(state, clock, config) {
+    const fx = state.fx || 1;
+    let eq = state.cash, unreal = 0;
+    for (const p of state.positions) { const px = marks[p.sym]?.price ?? p.last ?? p.entry; eq += (p.qty ?? p.shares) * px; unreal += (px - p.entry) * (p.qty ?? p.shares); }
+    const start = state.startUsd || state.startCash / fx;
+    const nowUsd = eq / fx, pnl = nowUsd - start, pct = pnl / start * 100;
+    const real = state.trades.reduce((a, t) => a + t.pnl, 0) / fx;
+    const wins = state.trades.filter(t => t.pnl > 0).length;
+    const dc = (state.decisions || []).reduce((a, d) => (a[d.status] = (a[d.status] || 0) + 1, a), {});
+    $('#dStart').textContent = dol(start);
+    $('#dNow').textContent = dol(nowUsd);
+    $('#dPnl').className = 'demo-pnl ' + (pnl >= 0 ? 'up' : 'down');
+    $('#dPnl').innerHTML = `${pnl >= 0 ? '▲' : '▼'} ${sdol(pnl)} <span style="font-weight:600;font-size:13px">(${pct >= 0 ? '+' : ''}${fmt(pct)}%)</span>`;
+    $('#dReal').innerHTML = `<span class="${real > 0 ? 'demo-up' : real < 0 ? 'demo-dn' : ''}">${sdol(real)}</span>`;
+    $('#dOpen').textContent = state.positions.length ? `${state.positions.length} · ${sdol(unreal / fx)}` : 'none';
+    $('#dTr').textContent = state.trades.length ? `${state.trades.length} · ${fmt(wins / state.trades.length * 100, 0)}%` : '0';
+    $('#dAppr').textContent = `${dc.approved || 0} / ${dc.rejected || 0}${dc.expired ? ` · ${dc.expired} expired` : ''}`;
+    let note = fx !== 1 ? `Held in rupees: ${usd(eq, 0)} at ₹${fmt(fx)} per $. ` : '';
+    if (report && report.totalPct != null) note += `The same rules replayed over the last ${report.sessions} sessions would have turned $10,000 into ${dol(10000 * (1 + report.totalPct / 100), 0)} (${report.totalPct >= 0 ? '+' : ''}${fmt(report.totalPct)}%).`;
+    $('#dNote').textContent = note || 'Profit and loss update live from every approved trade.';
+  }
+  function renderApprovals(state, clock, config) {
+    const pend = state.pending || [];
+    $('#apprCount').textContent = pend.length ? `${pend.length} waiting` : '0 waiting';
+    $('#apprCount').className = 'tag' + (pend.length ? ' rp' : '');
+    const now = Date.now() / 1000;
+    const fl = flash && Date.now() - flash.at < 20000 ? `<div class="flash ${flash.ok ? 'ok' : 'err'}">${esc(flash.text)}</div>` : '';
+    if (!pend.length) {
+      let when = '';
+      if (clock?.isOpen) {
+        const mins = clock.minutesSinceOpen ?? (now - clock.openTs) / 60;
+        const slot = Math.floor((mins - config.firstScanMin) / config.scanEveryMin);
+        const next = clock.openTs + (config.firstScanMin + config.scanEveryMin * (slot + 1)) * 60;
+        when = next < clock.closeTs - 3600 ? ` Next scan around ${etFmt.format(next * 1000)}.` : ' No new trades in the last hour of the session.';
+      } else when = ' The market is closed; proposals start at the first scan of the next session.';
+      $('#apprBody').innerHTML = fl + `<div class="empty" style="padding:18px 6px">Nothing waiting right now. When the scan finds a good setup it appears here with <b>Approve</b> and <b>Reject</b> buttons.${when}</div>`;
+    } else {
+      $('#apprBody').innerHTML = fl + pend.map(p => {
+        const left = Math.max(0, p.expiresAt - now);
+        return `<div class="appr">
+          <div class="appr-h"><b>${esc(p.sym)}</b><span class="tag g">+${fmt(p.gap)}% today</span><span class="appr-exp">⏱ ${left > 60 ? Math.floor(left / 60) + ' min left' : 'expiring'}</span></div>
+          <div class="appr-g">Buy ${(p.qty ?? p.shares)} @ ~${usd(p.entry)} · Stop ${usd(p.stop)} · Target ${usd(p.target)}<br>Money used ${usd(p.value, 0)} · Max loss if stopped ${usd(p.risk, 0)}${(state.fx || 1) !== 1 ? ` (${dol(p.risk / state.fx, 0)})` : ''}</div>
+          <div class="appr-b"><button class="btn ok" data-id="${esc(p.id)}" data-act="approve">✓ Approve &amp; buy</button><button class="btn no" data-id="${esc(p.id)}" data-act="reject">✕ Reject</button></div>
+        </div>`;
+      }).join('');
+    }
+    const dec = (state.decisions || []).slice(0, 6);
+    $('#decBody').innerHTML = dec.length ? dec.map(d => {
+      const ic = d.status === 'approved' ? '✅' : d.status === 'rejected' ? '⛔' : '⌛';
+      const txt = d.status === 'approved' ? `approved · bought ${d.qty ?? d.shares} @ ${usd(d.fill)}` : d.status === 'rejected' ? 'rejected' : `expired · ${esc(d.note || '')}`;
+      return `<div class="dec">${ic} <span><b>${esc(d.sym)}</b> ${txt}</span><time>${etFmt.format(d.decidedAt * 1000)}</time></div>`;
+    }).join('') : '<div style="color:var(--mute);font-size:13px">No decisions yet.</div>';
+  }
+  const PINKEY = 'approverPin';
+  const getPin = () => new Promise(resolve => {
+    try { const s = localStorage.getItem(PINKEY); if (s) return resolve(s); } catch {}
+    const dlg = $('#pinDlg'); $('#pinIn').value = '';
+    dlg.onclose = () => {
+      if (dlg.returnValue !== 'ok' || !$('#pinIn').value) return resolve(null);
+      const v = $('#pinIn').value.trim();
+      if ($('#pinRem').checked) { try { localStorage.setItem(PINKEY, v); } catch {} }
+      resolve(v);
+    };
+    dlg.showModal(); setTimeout(() => $('#pinIn').focus(), 50);
+  });
+  $('#apprBody').addEventListener('click', async e => {
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const pin = await getPin(); if (!pin) return;
+    document.querySelectorAll('#apprBody button').forEach(x => x.disabled = true);
+    b.textContent = b.dataset.act === 'approve' ? 'Checking live price…' : 'Rejecting…';
+    try {
+      const r = await fetch('/api/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: b.dataset.id, action: b.dataset.act, pin }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 401) { try { localStorage.removeItem(PINKEY); } catch {} }
+      flash = { ok: !!j.ok, text: j.message || j.error || 'Something went wrong.', at: Date.now() };
+    } catch (err) { flash = { ok: false, text: 'Network error. Please try again.', at: Date.now() }; }
+    await load();
+  });
 
   function ago(ts) {
     const s = Math.max(0, Date.now() / 1000 - ts);

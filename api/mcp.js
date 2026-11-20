@@ -4,9 +4,9 @@ import { TOOLS } from '../lib/tools.js';
 export const config = { maxDuration: 60 };
 
 const SUPPORTED = ['2025-06-18', '2025-03-26', '2024-11-05'];
-const SERVER = { name: 'nse-desk', title: 'NSE Desk', version: '1.1.0' };
+const SERVER = { name: 'multibank-automated-trading-nse', title: 'MultiBank Automated Trading · NSE', version: '2.0.0' };
 const INSTRUCTIONS = 'Live NSE (India) market tools for the NIFTY 500. Prices come from NSE official data first and are cross-checked against a second feed (see data_quality). Tools: market status, quotes, index quotes, market mood and India VIX, corporate actions, 52-week range, index valuation, gap-up scanner, movers, sector performance, ' +
-  'OHLCV history, symbol search, intraday charges, risk-based position sizing, plus the autonomous paper desk state and its strategy replay report. ' +
+  'OHLCV history, symbol search, intraday charges, risk-based position sizing, plus the automated paper desk ($10,000 demo account, every entry needs human approval), its pending approvals and its strategy replay report. ' +
   'All prices are in INR; times are IST. Data may be delayed. Not investment advice.';
 
 const ok = (id, result) => ({ jsonrpc: '2.0', id, result });

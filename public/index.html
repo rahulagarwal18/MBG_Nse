@@ -918,13 +918,17 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
       srClose(); srRun(v.split(/\s+/)[0]);
     };
   }
+  let srSeq = 0;
   async function srSuggest() {
     const q = $('#srIn').value.trim();
     if (q.length < 1) return srClose();
+    const my = ++srSeq;
+    const d = $('#srDrop'); d.innerHTML = '<div class="sr-none">🔎 Searching all listed stocks…</div>'; d.classList.remove('hidden');
     try {
-      srItems = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
-      srSel = -1; srPaint();
-    } catch {}
+      const items = await (await fetch('/api/search?q=' + encodeURIComponent(q.toLowerCase()))).json();
+      if (my !== srSeq) return;
+      srItems = items; srSel = -1; srPaint();
+    } catch { if (my === srSeq) { srItems = []; srPaint(); } }
   }
   function srPaint() {
     const d = $('#srDrop');

@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   const add = (s, n, i, px) => { if (!s) return; const cur = out.get(s) || {}; out.set(s, { s, n: cur.n || n || null, i: cur.i || i || null, px: cur.px ?? px ?? null }); };
   for (const [s, [n, i]] of Object.entries(INFO)) if (s.toLowerCase().includes(k) || n.toLowerCase().includes(k)) add(s, n, i);
   const [nse, yh] = await Promise.allSettled([
-    nseCall(NSE_HIST, 'search_symbols', { query: q }, 6000),
-    fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=15&newsCount=0`, { headers: UA }).then(r => r.json()),
+    nseCall(NSE_HIST, 'search_symbols', { query: q }, 2500),
+    fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=15&newsCount=0`, { headers: UA, signal: AbortSignal.timeout(3000) }).then(r => r.json()),
   ]);
   const names = {};
   if (yh.status === 'fulfilled') for (const x of yh.value.quotes || []) {

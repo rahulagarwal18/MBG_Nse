@@ -120,8 +120,38 @@ tr:last-child td{border-bottom:none}
 .note{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;color:var(--ink2);font-size:13.5px;margin-top:16px}
 footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
 .hidden{display:none!important}
+.sr-drop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:360px;overflow-y:auto}
+.sr-it{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line);font-size:14px}
+.sr-it:last-child{border-bottom:none} .sr-it:hover,.sr-it.on{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.sr-it b{font-weight:800} .sr-it span{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .sr-it em{font-style:normal;color:var(--mute);font-size:12px}
+.sr-none{padding:12px 14px;color:var(--mute);font-size:13.5px}
+.sr-badges{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}
+.bd1{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.bd1 span{font-size:26px} .bd1 b{font-size:15px;letter-spacing:-.01em} .bd1 small{color:var(--mute);font-size:12px}
+.bd1.up{border-color:color-mix(in srgb,var(--green) 45%,var(--line))} .bd1.dn{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
+.sr-bul p{margin:0 0 10px;font-size:15px;line-height:1.5} .sr-bottom{margin-top:6px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:700}
+.rb{padding:6px 4px 0} .rb-t{position:relative;height:26px;background:var(--chip);border-radius:13px;margin:28px 0 46px}
+.rb-t .w{position:absolute;top:0;bottom:0;background:var(--amber);opacity:.22;border-radius:13px} .rb-t .l{position:absolute;top:0;bottom:0;background:var(--amber);opacity:.55;border-radius:13px}
+.rb-t b{position:absolute;top:-8px;width:4px;height:42px;border-radius:2px;transform:translateX(-50%)} .rb-t .now{background:var(--accent)} .rb-t .exp{background:var(--amber)}
+.rb-l{position:relative;height:0;top:-40px} .rb-l span{position:absolute;transform:translateX(-50%);font:700 12.5px "JetBrains Mono",monospace;white-space:nowrap;text-align:center}
+.rb-l em{display:block;font:500 10.5px "Inter Tight",sans-serif;color:var(--mute)}
+.sr-meters{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.sr-meters .card .bd{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center} .sr-m{font-weight:800;font-size:15px}
+.sl{width:100%;padding:18px 4px 0} .sl-t{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green))}
+.sl-t i{position:absolute;top:-7px;width:6px;height:24px;border-radius:3px;background:var(--ink);transform:translateX(-50%);box-shadow:0 0 0 3px var(--paper)}
+.sl-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);margin-top:8px;width:100%}
+.sb{display:flex;width:100%;height:26px;border-radius:8px;overflow:hidden;margin-top:14px} .sb i{display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px "JetBrains Mono",monospace;font-style:normal}
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%;margin-top:14px} .m3 i{font-style:normal;font-size:11.5px;padding:10px 2px;border-radius:8px;background:var(--chip);color:var(--mute)}
+.m3 i.on{color:#fff;font-weight:800} .m3 .l0{background:var(--green)} .m3 .l1{background:var(--amber)} .m3 .l2{background:var(--red)}
+.vs-g{display:grid;grid-template-columns:1fr 1fr;gap:16px} .vs-h{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px} .vs-h b{font-size:20px}
+.vs-t{position:relative;height:14px;border-radius:7px;background:var(--chip)} .vs-t i{position:absolute;left:0;top:0;bottom:0;border-radius:7px} .vs-t b{position:absolute;top:-5px;width:3px;height:24px;background:var(--ink);transform:translateX(-50%)}
+.vs-r{font-size:11.5px;color:var(--mute);margin-top:6px}
+.sr-more{margin-top:16px} .sr-more summary{cursor:pointer;padding:14px 18px;font-weight:800;list-style:none} .sr-more summary::-webkit-details-marker{display:none}
+@media (max-width:1000px){.sr-badges{grid-template-columns:repeat(2,1fr)}.sr-meters{grid-template-columns:repeat(2,1fr)}.vs-g{grid-template-columns:1fr}}
+@media (max-width:600px){.sr-it{grid-template-columns:90px 1fr}.sr-it em{display:none}.rb-l span em{display:none}}
 .sr-form{display:flex;gap:10px;flex-wrap:wrap}
-.sr-form input{flex:1;min-width:220px;font:600 16px "Inter Tight",sans-serif;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.sr-box{position:relative;flex:1;min-width:220px}
+.sr-form input{width:100%;font:600 16px "Inter Tight",sans-serif;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .sr-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
 #srQuick .chip{cursor:pointer;border:1px solid var(--line)} #srQuick .chip:hover{border-color:var(--accent)}
 .sr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -341,8 +371,8 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
   <!-- STOCK REPORT -->
   <section id="tab-stock" class="hidden">
     <div class="card" style="margin-bottom:16px"><div class="bd">
-      <div class="eyebrow" style="margin-bottom:10px">Stock report · last 30 days + 5-day projection</div>
-      <form id="srForm" class="sr-form"><input id="srIn" list="srList" placeholder="Type a company or symbol, e.g. RELIANCE or Tata" autocomplete="off" spellcheck="false"><datalist id="srList"></datalist><button class="btn ok" style="background:var(--accent)">Get report</button></form>
+      <div class="eyebrow" style="margin-bottom:10px">Stock report · search any NSE stock</div>
+      <form id="srForm" class="sr-form" autocomplete="off"><div class="sr-box"><input id="srIn" placeholder="Type any company or symbol, e.g. Goyal Salt, Reliance, TCS" autocomplete="off" spellcheck="false"><div id="srDrop" class="sr-drop hidden"></div></div><button class="btn ok" style="background:var(--accent)">Get report</button></form>
       <div class="chips" id="srQuick" style="margin-top:10px"></div>
     </div></div>
     <div id="srOut"><div class="empty" style="padding:40px 10px">Pick a stock to see what it did in the last 30 days, where it may trade over the next 5 days, and how reliable that projection has been.</div></div>
@@ -864,102 +894,183 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
   }, 120000);
 
 
-  // ---- Stock report
-  let srReady = false, srBusy = false;
+  // ---- Stock report (search any stock, visual + plain-language report)
+  let srReady = false, srBusy = false, srTimer = null, srItems = [], srSel = -1;
   async function srInit() {
     if (srReady) return; srReady = true;
     const held = (last?.state?.positions || []).map(p => p.sym);
     const quick = [...new Set([...held, ...['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN']])].slice(0, 8);
     $('#srQuick').innerHTML = quick.map(s => `<span class="chip" data-s="${esc(s)}"><b>${esc(s)}</b></span>`).join('');
-    $('#srQuick').onclick = e => { const c = e.target.closest('[data-s]'); if (c) { $('#srIn').value = c.dataset.s; srRun(c.dataset.s); } };
-    $('#srForm').onsubmit = e => { e.preventDefault(); const v = $('#srIn').value.trim().split(/[\s—–-]+/)[0]; if (v) srRun(v); };
+    $('#srQuick').onclick = e => { const c = e.target.closest('[data-s]'); if (c) { $('#srIn').value = c.dataset.s; srClose(); srRun(c.dataset.s); } };
+    const inp = $('#srIn');
+    inp.oninput = () => { clearTimeout(srTimer); srTimer = setTimeout(srSuggest, 220); };
+    inp.onkeydown = e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!srItems.length) return; srSel = (srSel + (e.key === 'ArrowDown' ? 1 : -1) + srItems.length) % srItems.length; srPaint(); }
+      else if (e.key === 'Escape') srClose();
+    };
+    inp.onblur = () => setTimeout(srClose, 180);
+    $('#srDrop').onmousedown = e => { const it = e.target.closest('[data-i]'); if (it) { e.preventDefault(); srPick(srItems[+it.dataset.i]); } };
+    $('#srForm').onsubmit = e => {
+      e.preventDefault();
+      if (srSel >= 0 && srItems[srSel]) return srPick(srItems[srSel]);
+      const v = inp.value.trim(); if (!v) return;
+      if (srItems[0] && (srItems[0].s.toLowerCase() === v.toLowerCase() || (srItems[0].n || '').toLowerCase().includes(v.toLowerCase()))) return srPick(srItems[0]);
+      srClose(); srRun(v.split(/\s+/)[0]);
+    };
+  }
+  async function srSuggest() {
+    const q = $('#srIn').value.trim();
+    if (q.length < 1) return srClose();
     try {
-      const list = await (await fetch('/api/symbols')).json();
-      $('#srList').innerHTML = list.map(x => `<option value="${esc(x.s)}">${x.n ? esc(x.n) : ''}</option>`).join('');
+      srItems = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
+      srSel = -1; srPaint();
     } catch {}
   }
+  function srPaint() {
+    const d = $('#srDrop');
+    if (!srItems.length) { d.innerHTML = `<div class="sr-none">No match. Try the company name or its NSE/US symbol.</div>`; d.classList.remove('hidden'); return; }
+    d.innerHTML = srItems.map((x, i) => `<div class="sr-it${i === srSel ? ' on' : ''}" data-i="${i}"><b>${esc(x.s)}</b><span>${esc(x.n || '')}</span><em>${x.i ? esc(x.i) : x.px ? usd(x.px) : ''}</em></div>`).join('');
+    d.classList.remove('hidden');
+  }
+  function srClose() { $('#srDrop').classList.add('hidden'); srSel = -1; }
+  function srPick(x) { $('#srIn').value = x.s + (x.n ? ' — ' + x.n : ''); srClose(); srRun(x.s); }
+
   async function srRun(sym) {
     if (srBusy) return; srBusy = true;
     sym = sym.toUpperCase();
-    $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="empty" style="padding:40px 10px">Building the report for <b>${esc(sym)}</b>: one year of prices, 30-day analysis, 5-day projection and its accuracy check…</div></div></div>`;
+    $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="empty" style="padding:40px 10px">⏳ Preparing an easy report for <b>${esc(sym)}</b>…</div></div></div>`;
     try {
       const r = await fetch('/api/analyze?symbol=' + encodeURIComponent(sym));
       const d = await r.json();
       if (!r.ok || d.error) throw new Error(d.error || 'Report failed');
       srRender(d);
     } catch (e) {
-      $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="flash err">${esc(e.message)}</div></div></div>`;
+      $('#srOut').innerHTML = `<div class="card"><div class="bd"><div class="flash err">Could not find price data for “${esc(sym)}”. Pick the stock from the suggestions while typing.</div></div></div>`;
     } finally { srBusy = false; }
   }
+
+  // ---- small visuals
+  const C = () => { const c = getComputedStyle(document.documentElement); const g = k => c.getPropertyValue(k).trim(); return { acc: g('--accent'), green: g('--green'), red: g('--red'), amber: g('--amber'), mute: g('--mute'), line: g('--line'), ink: g('--ink'), chip: g('--chip') }; };
+  function gauge(score) {
+    const c = C(), cx = 110, cy = 100, r = 80;
+    const pt = (v, rr = r) => { const a = Math.PI * (1 - v / 100); return [cx + rr * Math.cos(a), cy - rr * Math.sin(a)]; };
+    const arc = (a, b, col) => { const [x1, y1] = pt(a), [x2, y2] = pt(b); return `<path d="M${x1},${y1} A${r},${r} 0 0 1 ${x2},${y2}" stroke="${col}" stroke-width="16" fill="none"/>`; };
+    const v = Math.max(0, Math.min(100, score ?? 50)), [nx, ny] = pt(v, r - 22);
+    return `<svg viewBox="0 0 220 120" style="width:100%;max-width:240px">${arc(0, 30, c.acc)}${arc(30, 70, c.chip)}${arc(70, 100, c.amber)}
+      <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="${c.ink}" stroke-width="4" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="7" fill="${c.ink}"/>
+      <text x="18" y="118" fill="${c.mute}" font-size="11">fell fast</text><text x="202" y="118" fill="${c.mute}" font-size="11" text-anchor="end">rose fast</text></svg>`;
+  }
+  function slider(lo, hi, val, loL, hiL) {
+    const p = hi > lo ? Math.max(0, Math.min(100, (val - lo) / (hi - lo) * 100)) : 50;
+    return `<div class="sl"><div class="sl-t"><i style="left:${p}%"></i></div><div class="sl-l"><span>${loL}</span><span>${hiL}</span></div></div>`;
+  }
+  function splitBar(a, b, la, lb) {
+    const t = a + b || 1;
+    return `<div class="sb"><i style="width:${a / t * 100}%;background:var(--green)">${a}</i><i style="width:${b / t * 100}%;background:var(--red)">${b}</i></div><div class="sl-l"><span>${la}</span><span>${lb}</span></div>`;
+  }
+  function meter3(level) {
+    return `<div class="m3">${['Calm', 'Normal', 'Very jumpy'].map((t, i) => `<i class="${i === level ? 'on l' + i : ''}">${t}</i>`).join('')}</div>`;
+  }
+  function rangeBar(d) {
+    const f = d.forecast[d.forecast.length - 1], lo = Math.min(f.low95, d.price), hi = Math.max(f.high95, d.price);
+    const X = v => (v - lo) / (hi - lo) * 100;
+    return `<div class="rb">
+      <div class="rb-t"><i class="w" style="left:${X(f.low95)}%;width:${X(f.high95) - X(f.low95)}%"></i><i class="l" style="left:${X(f.low68)}%;width:${X(f.high68) - X(f.low68)}%"></i>
+        <b class="now" style="left:${X(d.price)}%" title="today"></b><b class="exp" style="left:${X(f.expected)}%" title="expected"></b></div>
+      <div class="rb-l"><span style="left:${X(f.low95)}%">${usd(f.low95, 0)}<em>rare low</em></span><span style="left:${X(f.low68)}%">${usd(f.low68, 0)}<em>likely low</em></span>
+        <span style="left:${X(f.high68)}%">${usd(f.high68, 0)}<em>likely high</em></span><span style="left:${X(f.high95)}%">${usd(f.high95, 0)}<em>rare high</em></span></div>
+      <div class="sr-legend"><span><i style="background:var(--accent)"></i>today ${usd(d.price)}</span><span><i style="background:var(--amber)"></i>expected ${usd(f.expected)}</span><span><i style="background:var(--amber);opacity:.55"></i>likely (2 in 3 chance)</span><span><i style="background:var(--amber);opacity:.2"></i>rare outside this</span></div></div>`;
+  }
+  function vsBar(label, v, ref, refLabel, good) {
+    return `<div class="vs"><div class="vs-h"><span>${label}</span><b>${v == null ? '—' : fmt(v, 0) + '%'}</b></div><div class="vs-t"><i style="width:${Math.max(0, Math.min(100, v || 0))}%;background:${good ? 'var(--green)' : 'var(--amber)'}"></i><b style="left:${ref}%"></b></div><div class="vs-r">${refLabel}</div></div>`;
+  }
   function srChart(el, hist, fc) {
-    const css = getComputedStyle(document.documentElement);
-    const acc = css.getPropertyValue('--accent').trim(), line = css.getPropertyValue('--line').trim(), mute = css.getPropertyValue('--mute').trim(), amber = css.getPropertyValue('--amber').trim();
-    const W = el.clientWidth || 700, H = 300, pl = 8, pr = 74, pt = 12, pb = 28;
+    const c = C();
+    const W = el.clientWidth || 700, H = 280, pl = 8, pr = 74, pt = 12, pb = 28;
     const N = hist.length + fc.length;
     const vals = [...hist.map(h => h.close), ...fc.flatMap(f => [f.low95, f.high95])];
     let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
     const x = i => pl + i / (N - 1) * (W - pl - pr), y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
-    const L = hist.length - 1, last = hist[L].close;
+    const L = hist.length - 1, last = hist[L].close, up = last >= hist[0].close;
     const band = (a, b) => `M${x(L)},${y(last)} ` + fc.map((f, k) => `L${x(L + 1 + k)},${y(f[a])}`).join(' ') + ' ' + fc.map((f, k) => `L${x(L + fc.length - k)},${y(fc[fc.length - 1 - k][b])}`).join(' ') + ` L${x(L)},${y(last)} Z`;
     let g = '';
-    for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${line}" stroke-dasharray="2 4"/><text x="${W - pr + 8}" y="${yy + 4}" fill="${mute}" font-size="11" font-family="JetBrains Mono">${fmt(v, v < 100 ? 2 : 0)}</text>`; }
-    const lbl = (i, t, a) => `<text x="${x(i)}" y="${H - 8}" fill="${mute}" font-size="11" font-family="JetBrains Mono" text-anchor="${a}">${t}</text>`;
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">${g}
-      <rect x="${x(L)}" y="${pt}" width="${x(N - 1) - x(L)}" height="${H - pt - pb}" fill="${acc}" opacity=".05"/>
-      <path d="${band('low95', 'high95')}" fill="${amber}" opacity=".16"/><path d="${band('low68', 'high68')}" fill="${amber}" opacity=".32"/>
-      <path d="M${x(L)},${y(last)} ${fc.map((f, k) => `L${x(L + 1 + k)},${y(f.expected)}`).join(' ')}" fill="none" stroke="${amber}" stroke-width="2.2" stroke-dasharray="6 5"/>
-      <path d="${hist.map((h, i) => `${i ? 'L' : 'M'}${x(i)},${y(h.close)}`).join('')}" fill="none" stroke="${acc}" stroke-width="2.4" stroke-linejoin="round"/>
-      <circle cx="${x(L)}" cy="${y(last)}" r="4.5" fill="${acc}"/>
-      ${lbl(0, hist[0].date.slice(5), 'start')}${lbl(L, 'today', 'middle')}${lbl(N - 1, fc[fc.length - 1].date.slice(5), 'end')}
-      <text x="${x(L) + 6}" y="${pt + 14}" fill="${mute}" font-size="11" font-family="JetBrains Mono">next 5 days →</text></svg>`;
+    for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, yy = y(v); g += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${c.line}" stroke-dasharray="2 4"/><text x="${W - pr + 8}" y="${yy + 4}" fill="${c.mute}" font-size="11" font-family="JetBrains Mono">${fmt(v, v < 100 ? 2 : 0)}</text>`; }
+    const lbl = (i, t, a) => `<text x="${x(i)}" y="${H - 8}" fill="${c.mute}" font-size="11" font-family="JetBrains Mono" text-anchor="${a}">${t}</text>`;
+    const col = up ? c.green : c.red;
+    const area = hist.map((h, i) => `${i ? 'L' : 'M'}${x(i)},${y(h.close)}`).join('') + `L${x(L)},${H - pb}L${x(0)},${H - pb}Z`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block"><defs><linearGradient id="srg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".25"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>${g}
+      <path d="${area}" fill="url(#srg)"/>
+      <rect x="${x(L)}" y="${pt}" width="${x(N - 1) - x(L)}" height="${H - pt - pb}" fill="${c.acc}" opacity=".06"/>
+      <path d="${band('low95', 'high95')}" fill="${c.amber}" opacity=".16"/><path d="${band('low68', 'high68')}" fill="${c.amber}" opacity=".34"/>
+      <path d="M${x(L)},${y(last)} ${fc.map((f, k) => `L${x(L + 1 + k)},${y(f.expected)}`).join(' ')}" fill="none" stroke="${c.amber}" stroke-width="2.2" stroke-dasharray="6 5"/>
+      <path d="${hist.map((h, i) => `${i ? 'L' : 'M'}${x(i)},${y(h.close)}`).join('')}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linejoin="round"/>
+      <circle cx="${x(L)}" cy="${y(last)}" r="5" fill="${col}"/>
+      ${lbl(0, '30 days ago', 'start')}${lbl(L, 'today', 'middle')}${lbl(N - 1, '+5 days', 'end')}
+      <text x="${x(L) + 6}" y="${pt + 14}" fill="${c.mute}" font-size="11" font-family="JetBrains Mono">projection →</text></svg>`;
   }
+
   function srRender(d) {
     const m = d.metrics, a = d.accuracy, f5 = d.forecast[d.forecast.length - 1];
-    const rsiTxt = m.rsi14 >= 70 ? 'overbought: rose fast, often cools off' : m.rsi14 <= 30 ? 'oversold: fell fast, often bounces' : 'normal range';
-    const trendTxt = { up: 'short-term average above 20-day', down: 'short-term average below 20-day', sideways: 'no clear trend' }[m.trend] || '';
+    const vol = m.dailyVolatilityPct, volLvl = vol < 1.2 ? 0 : vol < 2.5 ? 1 : 2;
+    const speed = m.rsi14 >= 70 ? ['🔥', 'Rose very fast', 'Fast risers often cool off for a while'] : m.rsi14 <= 30 ? ['🧊', 'Fell very fast', 'Fast fallers often bounce back a little'] : ['😌', 'Normal pace', 'Not moving unusually fast either way'];
+    const yr = m.positionIn52wPct >= 80 ? ['⛰️', 'Near its 1-year high'] : m.positionIn52wPct <= 20 ? ['🕳️', 'Near its 1-year low'] : ['↔️', 'Middle of its 1-year range'];
+    const busy = m.volumeVsAvg >= 1.5 ? ['👥', 'Busier than usual today', `${fmt(m.volumeVsAvg, 1)}× normal trading`] : m.volumeVsAvg <= 0.6 ? ['🔕', 'Quieter than usual today', `${fmt(m.volumeVsAvg, 1)}× normal trading`] : ['👤', 'Normal trading activity', `${fmt(m.volumeVsAvg, 1)}× normal trading`];
+    const lines = String(d.analysis || '').split('\n').map(l => l.trim()).filter(Boolean);
+    const bottom = lines.find(l => /^bottom line/i.test(l));
+    const bullets = lines.filter(l => !/^bottom line/i.test(l)).slice(0, 6);
     const coin = a.directionHitPct == null || a.directionHitPct < 55;
     $('#srOut').innerHTML = `
       <div class="card" style="margin-bottom:16px"><div class="bd">
         <div class="sr-head">
           <div><div class="eyebrow">${esc(d.symbol)}${d.sector ? ' · ' + esc(d.sector) : ''}</div><h2>${esc(d.name)}</h2></div>
-          <div><div class="sr-price">${usd(d.price)}</div><div class="${cls(d.changePct)}" style="text-align:right;font-weight:800">${d.changePct >= 0 ? '+' : ''}${fmt(d.changePct)}% today <span class="tag" style="margin-left:6px">${esc(d.priceSource)}</span></div></div>
+          <div><div class="sr-price">${usd(d.price)}</div><div class="${cls(d.changePct)}" style="text-align:right;font-weight:800">${d.changePct >= 0 ? '▲ +' : '▼ '}${fmt(d.changePct)}% today <span class="tag" style="margin-left:6px">${esc(d.priceSource)}</span></div></div>
         </div>
-        <div class="sr-k">
-          <div><div class="l">30-day change</div><div class="v ${cls(m.return30Pct)}">${m.return30Pct >= 0 ? '+' : ''}${fmt(m.return30Pct)}%</div><div class="s">${m.upDays} up · ${m.downDays} down days</div></div>
-          <div><div class="l">30-day range</div><div class="v">${usd(m.low30, 0)}–${usd(m.high30, 0).replace(/^[^0-9]+/, '')}</div><div class="s">lowest – highest</div></div>
-          <div><div class="l">Trend</div><div class="v ${m.trend === 'up' ? 'pos' : m.trend === 'down' ? 'neg' : ''}">${esc(m.trend)}</div><div class="s">${trendTxt}</div></div>
-          <div><div class="l">RSI (14)</div><div class="v">${fmt(m.rsi14, 1)}</div><div class="s">${rsiTxt}</div></div>
-          <div><div class="l">Typical daily move</div><div class="v">±${fmt(m.dailyVolatilityPct)}%</div><div class="s">how jumpy the price is</div></div>
-          <div><div class="l">52-week position</div><div class="v">${fmt(m.positionIn52wPct, 0)}%</div><div class="s">0% = year low, 100% = high</div></div>
-        </div>
-        <div class="sr-grid">
-          <div><div id="srChart"></div>
-            <div class="sr-legend"><span><i style="background:var(--accent)"></i>last 30 days</span><span><i style="background:var(--amber)"></i>expected path</span><span><i style="background:var(--amber);opacity:.5"></i>likely range (68%)</span><span><i style="background:var(--amber);opacity:.25"></i>wide range (95%)</span></div>
-          </div>
-          <div>
-            <div class="eyebrow">Next 5 days · statistical projection</div>
-            <div class="sr-out ${d.outlook === 'leaning up' ? 'pos' : d.outlook === 'leaning down' ? 'neg' : ''}" style="margin:4px 0 8px">${esc(d.outlook[0].toUpperCase() + d.outlook.slice(1))} · ${fmt(d.probUpPct, 0)}% chance higher</div>
-            <div class="tscroll"><table><thead><tr><th>Day</th><th>Expected</th><th>Likely (68%)</th><th>Wide (95%)</th></tr></thead><tbody>
-              ${d.forecast.map(r => `<tr><td>${esc(r.date.slice(5))}</td><td><b>${usd(r.expected)}</b></td><td>${usd(r.low68, 0)}–${usd(r.high68, 0).replace(/^[^0-9]+/, '')}</td><td style="color:var(--mute)">${usd(r.low95, 0)}–${usd(r.high95, 0).replace(/^[^0-9]+/, '')}</td></tr>`).join('')}
-            </tbody></table></div>
-          </div>
+        <div class="sr-badges">
+          <div class="bd1 ${m.return30Pct >= 0 ? 'up' : 'dn'}"><span>${m.return30Pct >= 0 ? '📈' : '📉'}</span><b>${m.return30Pct >= 0 ? 'Up' : 'Down'} ${fmt(Math.abs(m.return30Pct), 1)}% this month</b><small>${usd(m.low30, 0)} lowest · ${usd(m.high30, 0)} highest</small></div>
+          <div class="bd1"><span>${speed[0]}</span><b>${speed[1]}</b><small>${speed[2]}</small></div>
+          <div class="bd1"><span>${['🟢', '🟡', '🎢'][volLvl]}</span><b>${['Calm stock', 'Normal swings', 'Very jumpy'][volLvl]}</b><small>moves about ${fmt(vol, 1)}% on a normal day</small></div>
+          <div class="bd1"><span>${yr[0]}</span><b>${yr[1]}</b><small>${fmt(m.positionIn52wPct, 0)}% of the way from low to high</small></div>
+          <div class="bd1"><span>${busy[0]}</span><b>${busy[1]}</b><small>${busy[2]}</small></div>
         </div>
       </div></div>
-      <div class="grid2">
-        <div class="card"><div class="hd"><h3>🧠 Analyst summary</h3><span class="tag ${d.analysisBy === 'ai' ? 'b' : ''}">${d.analysisBy === 'ai' ? 'AI analyst' : 'auto summary'}</span></div>
-          <div class="bd sr-ai">${esc(d.analysis).split('\n').map(l => /^(Last 30 days|Next 5 days \(projection\)|Risks to watch)\s*$/.test(l.trim()) ? `<b>${l.trim()}</b>` : l).join('\n')}</div></div>
-        <div class="card"><div class="hd"><h3>🎯 How reliable is this?</h3><span class="tag">${a.periodsTested} past tests</span></div>
-          <div class="bd">
-            <div style="font-size:13.5px;color:var(--ink2)">The same projection method was replayed on every trading day of the past year for this stock:</div>
-            <div class="sr-acc">
-              <div><div class="l eyebrow">Direction right</div><div class="v">${a.directionHitPct == null ? '—' : fmt(a.directionHitPct, 0) + '%'}</div><div class="s" style="font-size:12px;color:var(--mute)">coin flip = 50%</div></div>
-              <div><div class="l eyebrow">In likely range</div><div class="v">${fmt(a.within68BandPct, 0)}%</div><div class="s" style="font-size:12px;color:var(--mute)">target 68%</div></div>
-              <div><div class="l eyebrow">In wide range</div><div class="v">${fmt(a.within95BandPct, 0)}%</div><div class="s" style="font-size:12px;color:var(--mute)">target 95%</div></div>
-            </div>
-            <div class="why-risk" style="font-size:13px">${coin ? '⚠️ For this stock the up/down call is about as good as a coin flip. Trust the <b>price ranges</b>, not the direction.' : '✅ For this stock the up/down call beat a coin flip over the past year, but it is still often wrong.'} The ranges have been ${Math.abs(a.within68BandPct - 68) <= 6 ? 'well calibrated' : 'only roughly calibrated'}. Nobody can predict prices; this shows likely movement, not certainty.</div>
-          </div></div>
+
+      <div class="grid2" style="margin-bottom:16px">
+        <div class="card"><div class="hd"><h3>📊 Last 30 days and the next 5</h3></div><div class="bd"><div id="srChart"></div>
+          <div class="sr-legend"><span><i style="background:${m.return30Pct >= 0 ? 'var(--green)' : 'var(--red)'}"></i>real price</span><span><i style="background:var(--amber)"></i>expected path</span><span><i style="background:var(--amber);opacity:.5"></i>likely zone</span><span><i style="background:var(--amber);opacity:.2"></i>possible zone</span></div></div></div>
+        <div class="card"><div class="hd"><h3>💬 In simple words</h3><span class="tag ${d.analysisBy === 'ai' ? 'b' : ''}">${d.analysisBy === 'ai' ? 'AI analyst' : 'auto summary'}</span></div>
+          <div class="bd"><div class="sr-bul">${bullets.map(l => `<p>${esc(l)}</p>`).join('')}</div>${bottom ? `<div class="sr-bottom">${esc(bottom)}</div>` : ''}</div></div>
       </div>
-      <div class="note" style="margin-top:16px;font-size:12.5px"><b>How this is calculated.</b> ${esc(d.method)} The written summary only explains these numbers; it does not add predictions. Not investment advice.</div>`;
+
+      <div class="card" style="margin-bottom:16px"><div class="hd"><h3>🔮 Where could it be in 5 days? <span style="font-weight:600;color:var(--mute);font-size:13px">(${esc(f5.date)})</span></h3>
+        <span class="tag ${d.outlook === 'leaning up' ? 'g' : d.outlook === 'leaning down' ? 'r' : ''}">${esc(d.outlook)} · ${fmt(d.probUpPct, 0)}% chance higher</span></div>
+        <div class="bd">${rangeBar(d)}</div></div>
+
+      <div class="sr-meters">
+        <div class="card"><div class="bd"><div class="eyebrow">How fast it moved</div>${gauge(m.rsi14)}<div class="sr-m">${speed[1]}</div></div></div>
+        <div class="card"><div class="bd"><div class="eyebrow">How jumpy it is</div>${meter3(volLvl)}<div class="sr-m">about ${fmt(vol, 1)}% a day</div></div></div>
+        <div class="card"><div class="bd"><div class="eyebrow">1-year range</div>${slider(m.week52Low, m.week52High, d.price, usd(m.week52Low, 0) + ' low', usd(m.week52High, 0) + ' high')}<div class="sr-m">today ${usd(d.price, 0)}</div></div></div>
+        <div class="card"><div class="bd"><div class="eyebrow">Up days vs down days</div>${splitBar(m.upDays, m.downDays, 'up days', 'down days')}<div class="sr-m">in the last 30 trading days</div></div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px"><div class="hd"><h3>🎯 How much can you trust the projection?</h3><span class="tag">${a.periodsTested} past checks</span></div>
+        <div class="bd"><div style="font-size:13.5px;color:var(--ink2);margin-bottom:10px">We tested the same method on every day of the last year for this stock:</div>
+          <div class="vs-g">${vsBar('Guessed up/down correctly', a.directionHitPct, 50, 'the line marks a coin flip (50%)', !coin)}${vsBar('Price stayed inside the likely zone', a.within68BandPct, 68, 'the line marks the 68% it should be', Math.abs(a.within68BandPct - 68) <= 8)}</div>
+          <div class="why-risk" style="font-size:13.5px;margin-top:10px">${coin ? '⚠️ For this stock, up/down guesses are about as good as a coin flip. Use the <b>price zone</b>, not the direction.' : '✅ Up/down guesses beat a coin flip here, but were still often wrong.'} Nobody can predict prices; this shows likely movement, not certainty.</div></div></div>
+
+      <details class="card sr-more"><summary>📋 Detailed numbers (for experts)</summary><div class="bd">
+        <div class="sr-k">
+          <div><div class="l">30-day change</div><div class="v ${cls(m.return30Pct)}">${m.return30Pct >= 0 ? '+' : ''}${fmt(m.return30Pct)}%</div></div>
+          <div><div class="l">RSI (14)</div><div class="v">${fmt(m.rsi14, 1)}</div></div>
+          <div><div class="l">Daily volatility</div><div class="v">±${fmt(m.dailyVolatilityPct)}%</div></div>
+          <div><div class="l">Max drawdown (30d)</div><div class="v">${fmt(m.maxDrawdown30Pct)}%</div></div>
+          <div><div class="l">SMA 5 / 20</div><div class="v">${usd(m.sma5, 0)} / ${usd(m.sma20, 0).replace(/^[^0-9]+/, '')}</div></div>
+          <div><div class="l">Volume vs avg</div><div class="v">${fmt(m.volumeVsAvg, 2)}×</div></div>
+        </div>
+        <div class="tscroll"><table><thead><tr><th>Day</th><th>Expected</th><th>Likely (68%)</th><th>Possible (95%)</th></tr></thead><tbody>
+          ${d.forecast.map(r => `<tr><td>${esc(r.date)}</td><td><b>${usd(r.expected)}</b></td><td>${usd(r.low68)} – ${usd(r.high68)}</td><td style="color:var(--mute)">${usd(r.low95)} – ${usd(r.high95)}</td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="note" style="font-size:12.5px"><b>Method.</b> ${esc(d.method)} The written summary only explains these numbers. Not investment advice.</div>
+      </div></details>`;
     srChart($('#srChart'), d.history, d.forecast);
   }
 

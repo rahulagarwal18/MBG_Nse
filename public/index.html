@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gapline · NSE Desk</title>
+<meta name="description" content="Autonomous NSE intraday desk for the NIFTY 500. Scans, entries, stops and square-offs — live, net of Indian charges.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23d63a2f'/%3E%3Cpath d='M6 22l6-7 5 4 9-11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4efe6; --paper:#fbf8f2; --ink:#141312; --ink2:#4a4642; --mute:#8a847c; --line:#e3dccf; --grid:rgba(20,19,18,.045);
+  --red:#d63a2f; --green:#16825d; --green-bg:#e4f3ec; --red-bg:#fbe7e4; --blue:#2f5bd6; --amber:#c98a12; --chip:#efe8db;
+  --shadow:0 1px 0 rgba(20,19,18,.04), 0 8px 24px -12px rgba(20,19,18,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121110; --paper:#1a1918; --ink:#f3efe8; --ink2:#c4bdb2; --mute:#8a847c; --line:#2b2926; --grid:rgba(255,255,255,.035);
+    --red:#ff5a4c; --green:#3ccf91; --green-bg:rgba(60,207,145,.12); --red-bg:rgba(255,90,76,.12); --blue:#7d9bff; --amber:#f0b440; --chip:#24221f;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121110; --paper:#1a1918; --ink:#f3efe8; --ink2:#c4bdb2; --mute:#8a847c; --line:#2b2926; --grid:rgba(255,255,255,.035);
+  --red:#ff5a4c; --green:#3ccf91; --green-bg:rgba(60,207,145,.12); --red-bg:rgba(255,90,76,.12); --blue:#7d9bff; --amber:#f0b440; --chip:#24221f;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink); font-family:"Inter Tight",system-ui,sans-serif; font-size:15px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px 64px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:var(--red);display:grid;place-items:center}
+.brand b{font-weight:900;letter-spacing:-.02em;font-size:20px}
+.brand span{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.status{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:12.5px;font-weight:600;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.dot.live{background:var(--green);box-shadow:0 0 0 0 var(--green);animation:pulse 1.8s infinite}
+.dot.off{background:var(--amber)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+.iconbtn{background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+
+.hero{display:grid;grid-template-columns:1.2fr 2fr;gap:28px;align-items:end;padding:26px 0 22px;border-top:2px solid var(--ink)}
+.hero .num{font-family:"Instrument Serif",serif;color:var(--red);font-size:88px;line-height:.8;letter-spacing:-.02em}
+.hero h1{margin:6px 0 0;font-size:44px;line-height:1;font-weight:900;letter-spacing:-.035em}
+.hero p{margin:0;color:var(--ink2);font-size:17px;max-width:620px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+
+.tabs{display:flex;gap:6px;margin:6px 0 18px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--paper);color:var(--ink2);padding:8px 14px;border-radius:999px;font:600 13px "Inter Tight",sans-serif;cursor:pointer}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.kpi .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.kpi .v{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:12px;color:var(--mute);margin-top:2px}
+.pos{color:var(--green)} .neg{color:var(--red)}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);min-width:0}
+.card .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.card .hd h3{margin:0;font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.card .bd{padding:16px 18px}
+.grid2{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:16px}
+.grid2 > *{min-width:0}
+
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;position:relative;transition:.3s}
+.step .n{width:26px;height:26px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;margin-bottom:8px}
+.step b{display:block;font-size:13.5px;letter-spacing:-.01em}
+.step small{display:block;color:var(--mute);font-size:12px;margin-top:2px}
+.step.active{border-color:var(--red);box-shadow:0 0 0 3px color-mix(in srgb,var(--red) 18%,transparent)}
+.step.active .n{background:var(--red);color:#fff}
+
+svg.chart{width:100%;height:260px;display:block}
+.chart-empty{height:260px;display:grid;place-items:center;color:var(--mute);font-size:14px;text-align:center}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+tr:last-child td{border-bottom:none}
+.tscroll{overflow-x:auto}
+.sym{font-weight:800;letter-spacing:-.01em}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font:600 11px "JetBrains Mono",monospace;background:var(--chip);color:var(--ink2)}
+.tag.g{background:var(--green-bg);color:var(--green)} .tag.r{background:var(--red-bg);color:var(--red)} .tag.b{background:color-mix(in srgb,var(--blue) 14%,transparent);color:var(--blue)}
+.rbar{height:6px;border-radius:6px;background:var(--chip);position:relative;min-width:90px;overflow:hidden}
+.rbar i{position:absolute;top:0;bottom:0;border-radius:6px}
+.empty{color:var(--mute);text-align:center;padding:26px 10px;font-size:14px}
+
+.feed{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding:14px;background:
+  radial-gradient(circle at 20% 10%,color-mix(in srgb,var(--green) 8%,transparent),transparent 50%),var(--paper);border-radius:0 0 16px 16px}
+.msg{align-self:flex-start;max-width:92%;background:var(--bg);border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:9px 12px;font-size:12.5px;white-space:pre-wrap;font-family:"JetBrains Mono",monospace;line-height:1.5}
+.msg time{display:block;text-align:right;color:var(--mute);font-size:10.5px;margin-top:4px}
+.msg.entry{border-left:3px solid var(--green)} .msg.exit{border-left:3px solid var(--ink2)} .msg.stop{border-left:3px solid var(--blue)} .msg.scan{border-left:3px solid var(--amber)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;gap:6px;align-items:baseline;padding:6px 10px;border-radius:10px;background:var(--chip);font-size:13px}
+.chip b{font-weight:800} .chip span{color:var(--green);font:600 12px "JetBrains Mono",monospace}
+
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rule{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px}
+.rule .l{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.rule .v{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.rule .s{font-size:12px;color:var(--mute)}
+.note{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;color:var(--ink2);font-size:13.5px;margin-top:16px}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
+.hidden{display:none!important}
+.banner{display:flex;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:14px;color:var(--ink2);box-shadow:var(--shadow)}
+.banner b{color:var(--ink)}
+.code{font:500 12.5px/1.6 "JetBrains Mono",monospace;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;white-space:pre-wrap;word-break:break-all;margin:0;color:var(--ink)}
+.tool{padding:12px 0;border-bottom:1px solid var(--line)} .tool:last-child{border-bottom:none}
+.tool b{font:600 13.5px "JetBrains Mono",monospace;color:var(--red)} .tool p{margin:4px 0 0;color:var(--ink2);font-size:13.5px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.barrow{display:grid;grid-template-columns:minmax(0,190px) 1fr 64px;gap:10px;align-items:center;font-size:13px}
+.barrow span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.bartrack{height:8px;background:var(--chip);border-radius:6px;position:relative}
+.bartrack i{position:absolute;top:0;bottom:0;border-radius:6px}
+.breadth{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.pgrid .l{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.pgrid .v{font-size:22px;font-weight:800;letter-spacing:-.02em}
+@media (max-width:600px){.pgrid{grid-template-columns:1fr 1fr}.barrow{grid-template-columns:110px 1fr 56px}}
+.tag.rp{background:color-mix(in srgb,var(--amber) 16%,transparent);color:var(--amber)}
+.skel{background:linear-gradient(90deg,var(--chip),var(--line),var(--chip));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;color:transparent!important}
+@keyframes sk{to{background-position:-200% 0}}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:500 12px "JetBrains Mono",monospace;padding:7px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-115%);opacity:0;transition:opacity .12s}
+
+@media (max-width:1000px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .pipeline{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto}
+  .rules{grid-template-columns:repeat(2,1fr)}
+  .hero{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .wrap{padding:0 16px 48px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .hero .num{font-size:64px} .hero h1{font-size:34px}
+  .kpi .v{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark"><svg width="20" height="20" viewBox="0 0 32 32"><path d="M5 23l7-8 5 4 10-12" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><b>Gapline <i style="font-style:normal;letter-spacing:.08em;font-size:12px;color:var(--red);font-weight:800;vertical-align:middle">NSE</i></b><span>Autonomous Desk · India</span></div>
+    </div>
+    <div class="status">
+      <span class="pill"><span class="dot" id="mDot"></span><span id="mText">Connecting…</span></span>
+      <span class="pill mono" id="clockPill">--:-- IST</span>
+      <span class="pill" id="beatPill" title="Last bot heartbeat">♥ <span id="beat">—</span></span>
+      <button class="iconbtn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">NIFTY 500 · intraday momentum</div>
+      <div class="num">₹ NSE</div>
+    </div>
+    <div>
+      <h1>It trades by itself.</h1>
+      <p style="margin-top:10px">Scans all NIFTY 500 stocks every 30 minutes from 09:40 IST, buys the gappers with a hard stop, trails its own stops and squares off by 15:20. Every result is shown net of brokerage, STT, GST and stamp duty.</p>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-tab="live">Live desk</button>
+    <button class="tab" data-tab="report">Strategy report</button>
+    <button class="tab" data-tab="rules">Rules</button>
+    <button class="tab" data-tab="connect">Connect · MCP</button>
+  </nav>
+
+  <!-- LIVE -->
+  <main id="tab-live">
+    <div class="banner hidden" id="modeBanner"></div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">Equity</div><div class="v" id="kEq">—</div><div class="s" id="kEqS">simulated account</div></div>
+      <div class="kpi"><div class="l">Today</div><div class="v" id="kDay">—</div><div class="s" id="kDayS">realized + open</div></div>
+      <div class="kpi"><div class="l">Total P&amp;L</div><div class="v" id="kTot">—</div><div class="s" id="kTotS">since start</div></div>
+      <div class="kpi"><div class="l">Win rate</div><div class="v" id="kWin">—</div><div class="s" id="kWinS">closed trades</div></div>
+      <div class="kpi"><div class="l">Open</div><div class="v" id="kOpen">—</div><div class="s" id="kOpenS">positions</div></div>
+      <div class="kpi"><div class="l">Max drawdown</div><div class="v" id="kDD">—</div><div class="s" id="kDDS">peak to trough</div></div>
+    </div>
+
+    <div class="pipeline" id="pipe">
+      <div class="step" data-s="1"><div class="n">1</div><b>Scan the market</b><small>NIFTY 500 · 501 symbols</small></div>
+      <div class="step" data-s="2"><div class="n">2</div><b>Pull live quotes</b><small>batched, every tick</small></div>
+      <div class="step" data-s="3"><div class="n">3</div><b>Filter gappers</b><small>+2.5% and holding</small></div>
+      <div class="step" data-s="4"><div class="n">4</div><b>Execute</b><small>entry · stop · target</small></div>
+      <div class="step" data-s="5"><div class="n">5</div><b>Repeat</b><small id="nextScan">every 30 min</small></div>
+    </div>
+
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card">
+          <div class="hd"><h3>Equity curve</h3><span class="eyebrow" id="eqRange"></span></div>
+          <div class="bd" style="position:relative" id="eqWrap"><div class="chart-empty skel" style="color:transparent">loading</div></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Open positions</h3><span class="eyebrow" id="posNote">live marks</span></div>
+          <div class="tscroll"><table>
+            <thead><tr><th>Symbol</th><th>Qty</th><th>Entry</th><th>Last</th><th>Stop</th><th>Target</th><th>Progress</th><th>P&amp;L</th></tr></thead>
+            <tbody id="posBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Market pulse</h3><span class="eyebrow" id="pulseMeta"></span></div>
+          <div class="bd" id="pulseBody"><div class="empty">Loading market breadth…</div></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Latest scan</h3><span class="eyebrow" id="scanMeta"></span></div>
+          <div class="bd" id="scanBody"><div class="empty">Waiting for the first scan of the session.</div></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Trade history</h3><span class="eyebrow" id="histMeta"></span></div>
+          <div class="tscroll"><table>
+            <thead><tr><th>Symbol</th><th>Date</th><th>Qty</th><th>Entry</th><th>Exit</th><th>R</th><th>Charges</th><th>Net P&amp;L</th><th>Exit reason</th></tr></thead>
+            <tbody id="histBody"><tr><td colspan="9" class="empty">No closed trades yet.</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div class="card" style="align-self:start;position:sticky;top:12px">
+        <div class="hd"><h3>📡 Live bot feed</h3><span class="tag g" id="feedCount">0</span></div>
+        <div class="feed" id="feed"><div class="empty">No events yet.</div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- REPORT -->
+  <section id="tab-report" class="hidden">
+    <div class="hero" style="border-top:none;padding-top:0">
+      <div><div class="eyebrow">Strategy report</div><div class="num" style="font-size:72px" id="rSessions">—</div></div>
+      <div><h1 id="rHead" style="font-size:36px">Replaying the exact rules…</h1>
+        <p style="margin-top:8px" id="rSub">Every scan, entry, stop and square-off re-run on 5-minute data for all NIFTY 500 stocks over the last ~60 sessions, net of charges.</p></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">Total P&amp;L</div><div class="v" id="rPnl">—</div><div class="s" id="rPct"></div></div>
+      <div class="kpi"><div class="l">Win rate</div><div class="v" id="rWin">—</div><div class="s" id="rWinS"></div></div>
+      <div class="kpi"><div class="l">Trades</div><div class="v" id="rTr">—</div><div class="s">closed</div></div>
+      <div class="kpi"><div class="l">Profit factor</div><div class="v" id="rPf">—</div><div class="s">gross win / loss</div></div>
+      <div class="kpi"><div class="l">Charges paid</div><div class="v" id="rAvg">—</div><div class="s">brokerage, STT, GST, stamp</div></div>
+      <div class="kpi"><div class="l">Max drawdown</div><div class="v" id="rDD">—</div><div class="s" id="rDDS"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="hd"><h3>Replay equity</h3><span class="eyebrow" id="rRange"></span></div>
+      <div class="bd" style="position:relative" id="rEqWrap"><div class="chart-empty skel">loading</div></div>
+    </div>
+    <div class="card">
+      <div class="hd"><h3>Most recent replay trades</h3></div>
+      <div class="tscroll"><table>
+        <thead><tr><th>Symbol</th><th>Date</th><th>Gap</th><th>Qty</th><th>Entry</th><th>Exit</th><th>R</th><th>Charges</th><th>Net P&amp;L</th><th>Exit reason</th></tr></thead>
+        <tbody id="rBody"><tr><td colspan="10" class="empty">Loading…</td></tr></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section id="tab-rules" class="hidden">
+    <div class="rules" id="rulesGrid"></div>
+    <div class="note">
+      <b>How a day runs.</b> At 09:40 IST the desk pulls live quotes for all NIFTY 500 stocks and keeps only the ones that opened at least 1.5% above the previous close, are up 2.5% or more, and are still holding above the open. The strongest names are bought (intraday) with a stop under the day’s low (2–5% away), sized so a stop-out costs 1% of capital, with no position above 20% of capital. At +1R the stop moves to breakeven; past +2R it trails 1R behind price; at +3R the target books profit. The scan repeats every 30 minutes, no new entries after 14:30, and everything is squared off by 15:20 IST, before the broker’s auto square-off. Every P&amp;L figure is net of brokerage, STT, exchange and SEBI fees, stamp duty and GST.
+    </div>
+  </section>
+
+  <!-- CONNECT -->
+  <section id="tab-connect" class="hidden">
+    <div class="hero" style="border-top:none;padding-top:0">
+      <div><div class="eyebrow">Model Context Protocol</div><div class="num" style="font-size:72px">MCP</div></div>
+      <div><h1 style="font-size:36px">Plug the NSE desk into any AI assistant.</h1>
+        <p style="margin-top:8px">One endpoint gives any MCP-compatible assistant or agent live NSE data, the NIFTY 500 scanner, sector breadth, price history, Indian charges and position sizing, plus this desk’s live state and strategy report.</p></div>
+    </div>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card">
+          <div class="hd"><h3>Endpoint</h3><span class="tag g">Streamable HTTP · no auth · read-only</span></div>
+          <div class="bd">
+            <div class="code" id="mcpUrl"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="tab" id="copyUrl">Copy URL</button><button class="tab" id="copyCfg">Copy client config</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Client config</h3><span class="eyebrow">add to your MCP client</span></div>
+          <div class="bd"><pre class="code" id="mcpCfg"></pre></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Try it from a terminal</h3></div>
+          <div class="bd"><pre class="code" id="mcpCurl"></pre></div>
+        </div>
+      </div>
+      <div class="card" style="align-self:start">
+        <div class="hd"><h3>Tools</h3><span class="tag" id="toolCount">…</span></div>
+        <div class="bd" id="toolList"><div class="empty">Loading tool catalogue…</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="hd"><h3>Live tool console</h3><span class="eyebrow">calls the real endpoint</span></div>
+      <div class="bd">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="tryBtns"></div>
+        <pre class="code" id="tryOut" style="max-height:420px;overflow:auto">Pick a tool above to run it live.</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Paper account on live NSE data (may be delayed). For research and education only. Not investment advice.</span>
+    <span class="mono" id="updated"></span>
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const fmt = (n, d = 2) => n == null || isNaN(n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const usd = (n, d = 2) => n == null || isNaN(n) ? '—' : (n < 0 ? '-₹' : '₹') + Number(Math.abs(n)).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const sgnUsd = n => (n > 0 ? '+' : '') + usd(n);
+  const cls = n => n > 0 ? 'pos' : n < 0 ? 'neg' : '';
+  const etFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false });
+  const etDay = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric' });
+  const etFull = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', hour: 'numeric', minute: '2-digit' });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // theme
+  try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+  $('#themeBtn').onclick = () => {
+    const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const nx = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = nx;
+    try { localStorage.setItem('theme', nx); } catch {}
+    if (last) render(last); if (report) renderReport(report);
+  };
+
+  // tabs
+  let report = null;
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b));
+    ['live', 'report', 'rules', 'connect'].forEach(k => $('#tab-' + k).classList.toggle('hidden', k !== b.dataset.tab));
+    if (b.dataset.tab === 'report' && !report) loadReport();
+    if (b.dataset.tab === 'connect') loadTools();
+    try { localStorage.setItem('tab', b.dataset.tab); } catch {}
+  });
+
+  // chart
+  function chart(el, pts, { base, labels } = {}) {
+    const css = getComputedStyle(document.documentElement);
+    const green = css.getPropertyValue('--green').trim(), red = css.getPropertyValue('--red').trim();
+    const line = css.getPropertyValue('--line').trim(), mute = css.getPropertyValue('--mute').trim();
+    if (!pts || pts.length < 2) { el.innerHTML = '<div class="chart-empty">The curve starts drawing with the first marked tick of a session.</div>'; return; }
+    const W = el.clientWidth || 700, H = 260, pl = 8, pr = 64, pt = 14, pb = 26;
+    const vs = pts.map(p => p.v);
+    let lo = Math.min(...vs, base ?? Infinity), hi = Math.max(...vs, base ?? -Infinity);
+    const pad = (hi - lo) * 0.12 || hi * 0.01 || 1; lo -= pad; hi += pad;
+    const x = i => pl + (i / (pts.length - 1)) * (W - pl - pr);
+    const y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+    const up = vs[vs.length - 1] >= (base ?? vs[0]);
+    const col = up ? green : red;
+    let d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
+    const area = d + `L${x(pts.length - 1)},${H - pb}L${x(0)},${H - pb}Z`;
+    const ticks = 4; let grid = '';
+    for (let i = 0; i <= ticks; i++) {
+      const v = lo + (hi - lo) * i / ticks, yy = y(v);
+      grid += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${line}" stroke-dasharray="2 4"/>` +
+        `<text x="${W - pr + 8}" y="${yy + 4}" fill="${mute}" font-size="11" font-family="JetBrains Mono">${Math.round(v).toLocaleString()}</text>`;
+    }
+    let xl = '';
+    const n = Math.min(5, pts.length);
+    for (let i = 0; i < n; i++) {
+      const k = Math.round(i * (pts.length - 1) / Math.max(1, n - 1));
+      xl += `<text x="${x(k)}" y="${H - 6}" fill="${mute}" font-size="11" font-family="JetBrains Mono" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${labels(pts[k])}</text>`;
+    }
+    const baseLine = base != null ? `<line x1="${pl}" x2="${W - pr}" y1="${y(base)}" y2="${y(base)}" stroke="${mute}" stroke-width="1" opacity=".6"/>` : '';
+    const lastV = vs[vs.length - 1];
+    el.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs><linearGradient id="g${el.id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".22"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+      ${grid}${baseLine}<path d="${area}" fill="url(#g${el.id})"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="${x(pts.length - 1)}" cy="${y(lastV)}" r="4" fill="${col}"/>
+      <rect x="${W - pr + 2}" y="${y(lastV) - 10}" width="${pr - 4}" height="20" rx="4" fill="${col}"/>
+      <text x="${W - pr + 6}" y="${y(lastV) + 4}" fill="#fff" font-size="11" font-weight="600" font-family="JetBrains Mono">${Math.round(lastV).toLocaleString()}</text>
+      ${xl}<line id="hv${el.id}" y1="${pt}" y2="${H - pb}" stroke="${mute}" opacity="0"/></svg>`;
+    const svg = el.querySelector('svg'), tip = $('#tip'), hv = el.querySelector('#hv' + el.id);
+    svg.onmousemove = e => {
+      const r = svg.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(pts.length - 1, Math.round((px - pl) / (W - pl - pr) * (pts.length - 1))));
+      hv.setAttribute('x1', x(i)); hv.setAttribute('x2', x(i)); hv.setAttribute('opacity', '.6');
+      tip.textContent = `${labels(pts[i], true)} · ${usd(pts[i].v)}`;
+      tip.style.left = (r.left + x(i) / W * r.width + scrollX) + 'px'; tip.style.top = (r.top + y(pts[i].v) / H * r.height + scrollY) + 'px'; tip.style.opacity = 1;
+    };
+    svg.onmouseleave = () => { tip.style.opacity = 0; hv.setAttribute('opacity', '0'); };
+  }
+
+  let last = null, marks = {}, snap = null, snapAt = 0;
+  async function load() {
+    try {
+      const jobs = [fetch('/api/state', { cache: 'no-store' }).then(r => r.json())];
+      if (!report) jobs.push(fetch('/api/report').then(r => r.json()).then(j => { if (!j.error) { report = j; renderReport(j); } }).catch(() => {}));
+      if (!snap || Date.now() - snapAt > 60000) jobs.push(fetch('/api/scan').then(r => r.json()).then(j => { if (!j.error) { snap = j; snapAt = Date.now(); } }).catch(() => {}));
+      const [st] = await Promise.all(jobs);
+      last = st;
+      await loadMarks();
+      render(last);
+    } catch (e) { $('#mText').textContent = 'Reconnecting…'; }
+  }
+  async function loadMarks() {
+    const syms = (last?.state?.positions || []).map(p => p.sym);
+    if (!syms.length) { marks = {}; return; }
+    try { marks = await (await fetch('/api/quotes?symbols=' + syms.join(','))).json(); } catch {}
+  }
+
+  function render({ state, clock, config }) {
+    const now = Date.now() / 1000;
+    // status
+    const open = clock?.isOpen;
+    $('#mDot').className = 'dot ' + (open ? 'live' : 'off');
+    if (open) {
+      const mins = clock.minutesSinceOpen ?? (now - clock.openTs) / 60;
+      const slot = Math.floor((mins - config.firstScanMin) / config.scanEveryMin);
+      const nextTs = clock.openTs + (config.firstScanMin + config.scanEveryMin * (slot + 1)) * 60;
+      $('#mText').textContent = 'NSE open · desk trading';
+      $('#nextScan').textContent = nextTs < clock.closeTs - 660 ? 'next scan ' + etFmt.format(nextTs * 1000) + ' IST' : 'squaring off';
+    } else {
+      const nxt = clock && clock.openTs > now ? clock.openTs : null;
+      $('#mText').textContent = nxt ? `NSE closed · opens ${etFull.format(nxt * 1000)} IST` : 'NSE closed · desk standing by';
+      $('#nextScan').textContent = 'first scan 09:40 IST';
+    }
+    // active pipeline step
+    let active = 5;
+    if (open) {
+      const lt = state.lastTickInfo?.actions || [];
+      active = lt.some(a => a.startsWith('buy')) ? 4 : lt.some(a => a.startsWith('scan')) ? 3 : state.positions.length ? 2 : 5;
+    }
+    document.querySelectorAll('.step').forEach(s => s.classList.toggle('active', +s.dataset.s === active));
+
+    $('#beat').textContent = state.lastTick ? ago(state.lastTick) : 'starting';
+    // equity
+    let eq = state.cash, unreal = 0;
+    for (const p of state.positions) { const px = marks[p.sym]?.price ?? p.last ?? p.entry; eq += p.qty * px; unreal += (px - p.entry) * p.qty; }
+    const tot = eq - state.startCash;
+    const today = clock?.sessionDate;
+    const tToday = state.trades.filter(t => t.date === today);
+    const dayP = tToday.reduce((a, t) => a + t.pnl, 0) + unreal;
+    const wins = state.trades.filter(t => t.pnl > 0).length;
+    let peak = -Infinity, dd = 0;
+    for (const p of state.equity) { peak = Math.max(peak, p.v); dd = Math.max(dd, (peak - p.v) / peak * 100); }
+    $('#kEq').textContent = usd(eq);
+    $('#kEqS').textContent = `paper capital ${usd(state.startCash, 0)}`;
+    $('#kDay').textContent = sgnUsd(dayP); $('#kDay').className = 'v ' + cls(dayP);
+    $('#kDayS').textContent = `${tToday.length} closed today`;
+    $('#kTot').textContent = sgnUsd(tot); $('#kTot').className = 'v ' + cls(tot);
+    $('#kTotS').textContent = (tot >= 0 ? '+' : '') + fmt(tot / state.startCash * 100) + '% · net of ' + usd(state.charges || 0, 0) + ' charges';
+    $('#kWin').textContent = state.trades.length ? fmt(wins / state.trades.length * 100, 0) + '%' : '—';
+    $('#kWinS').textContent = `${wins} of ${state.trades.length} trades`;
+    $('#kOpen').textContent = `${state.positions.length}/${config.maxPositions}`;
+    $('#kOpenS').textContent = state.positions.length ? `open P&L ${sgnUsd(unreal)}` : 'flat';
+    $('#kDD').textContent = fmt(dd) + '%';
+
+    // equity curve
+    const pts = [...state.equity];
+    if (state.positions.length) pts.push({ t: now, v: eq });
+    $('#eqRange').textContent = pts.length > 1 ? `${etDay.format(pts[0].t * 1000)} → now` : '';
+    chart($('#eqWrap'), pts, { base: state.startCash, labels: (p, full) => full ? etDay.format(p.t * 1000) + ' ' + etFmt.format(p.t * 1000) : etDay.format(p.t * 1000) });
+
+    // positions
+    $('#posBody').innerHTML = state.positions.length ? state.positions.map(p => {
+      const px = marks[p.sym]?.price ?? p.last ?? p.entry;
+      const pnl = (px - p.entry) * p.qty;
+      const lo = p.initStop, hi = p.target, f = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+      const stage = p.stage === 'breakeven' ? '<span class="tag b">BE</span>' : p.stage === 'trailing' ? '<span class="tag b">TRAIL</span>' : '';
+      return `<tr><td><span class="sym">${esc(p.sym)}</span> <span class="tag g">+${fmt(p.gap)}%</span> ${stage}</td>
+        <td>${p.qty}</td><td>${usd(p.entry)}</td><td>${usd(px)}</td><td>${usd(p.stop)}</td><td>${usd(p.target)}</td>
+        <td><div class="rbar" title="stop → target"><i style="left:0;width:${f(p.entry)}%;background:color-mix(in srgb,var(--red) 30%,transparent)"></i><i style="left:${f(Math.min(px, p.entry))}%;width:${Math.abs(f(px) - f(p.entry))}%;background:${px >= p.entry ? 'var(--green)' : 'var(--red)'}"></i></div></td>
+        <td class="${cls(pnl)}"><b>${sgnUsd(pnl)}</b></td></tr>`;
+    }).join('') : `<tr><td colspan="8" class="empty">${open ? 'Flat. Waiting for the next scan to find gappers.' : `Flat. Every position is squared off by 15:20 IST.`'}</td></tr>`;
+
+    // scan — live scan during the session, otherwise the latest market snapshot
+    const liveScan = state.scans[0] && clock?.isOpen && state.scans[0].t >= clock.openTs ? state.scans[0] : null;
+    const sc = liveScan || (snap ? { ...snap, label: `${clock?.isOpen ? 'Live snapshot' : 'Last close'} · ${etDay.format(snap.asOf * 1000)} ${snap.label}` } : state.scans[0]);
+    if (sc) {
+      $('#scanMeta').textContent = `${sc.label} · ${sc.count}/${sc.total} survivors · ${sc.secs}s`;
+      $('#scanBody').innerHTML = sc.survivors.length ? `<div class="chips">${sc.survivors.map(s => `<span class="chip"><b>${esc(s.sym)}</b><span>+${fmt(s.chg)}%</span></span>`).join('')}</div>`
+        : `<div style="color:var(--mute);font-size:13.5px;margin-bottom:10px">No stock was still holding a +${config.minGapPct}% gap at this scan. Top movers in the universe:</div>` +
+          (sc.gainers?.length ? `<div class="chips">${sc.gainers.map(s => `<span class="chip"><b>${esc(s.sym)}</b><span style="color:${s.chg >= 0 ? 'var(--green)' : 'var(--red)'}">${s.chg >= 0 ? '+' : ''}${fmt(s.chg)}%</span></span>`).join('')}</div>` : '');
+    }
+
+    // history
+    $('#histMeta').textContent = state.trades.length ? `${state.trades.length} trades` : '';
+    $('#histBody').innerHTML = state.trades.length ? state.trades.slice(0, 60).map(t => `<tr>
+      <td class="sym">${esc(t.sym)}</td><td>${etDay.format(t.closedAt * 1000)}</td><td>${t.qty}</td><td>${usd(t.entry)}</td><td>${usd(t.exit)}</td>
+      <td class="${cls(t.r)}">${t.r > 0 ? '+' : ''}${fmt(t.r)}R</td><td style="color:var(--mute)">${usd(t.charges)}</td><td class="${cls(t.pnl)}"><b>${sgnUsd(t.pnl)}</b></td><td><span class="tag ${t.reason === 'target hit' ? 'g' : t.reason.includes('stop') ? 'r' : ''}">${esc(t.reason)}</span></td></tr>`).join('')
+      : '<tr><td colspan="9" class="empty">No closed trades yet.</td></tr>';
+
+    // feed
+    $('#feedCount').textContent = state.events.length;
+    $('#feed').innerHTML = state.events.slice(0, 80).map(e => `<div class="msg ${e.type}">${esc(e.text)}<time>${etDay.format(e.t * 1000)} · ${etFmt.format(e.t * 1000)} IST</time></div>`).join('') || '<div class="empty">No events yet.</div>';
+
+    // Market pulse: NIFTY 50, breadth, sectors, movers
+    if (snap) {
+      const idx = clock?.index;
+      const tot = snap.breadth.adv + snap.breadth.dec || 1;
+      const maxAbs = Math.max(0.5, ...snap.sectors.map(x => Math.abs(x.c)));
+      const sec = [...snap.sectors].filter(x => x.n >= 3);
+      const show = [...sec.slice(0, 5), ...sec.slice(-4)];
+      $('#pulseMeta').textContent = `${clock?.isOpen ? 'live' : 'last close'} · ${snap.label}`;
+      $('#pulseBody').innerHTML = `
+        <div class="pgrid">
+          <div><div class="l">NIFTY 50</div><div class="v">${idx ? fmt(idx.price) : '—'}</div><div class="${cls(idx?.changePct)}" style="font-weight:700;font-size:13px">${idx ? (idx.changePct >= 0 ? '+' : '') + fmt(idx.changePct) + '%' : ''}</div></div>
+          <div><div class="l">Advancers</div><div class="v pos">${snap.breadth.adv}</div><div style="color:var(--mute);font-size:13px">of ${snap.total}</div></div>
+          <div><div class="l">Decliners</div><div class="v neg">${snap.breadth.dec}</div><div style="color:var(--mute);font-size:13px">of ${snap.total}</div></div>
+        </div>
+        <div class="breadth"><i style="width:${snap.breadth.adv / tot * 100}%;background:var(--green)"></i><i style="flex:1;background:var(--red)"></i></div>
+        <div style="display:flex;justify-content:space-between;color:var(--mute);font-size:12px;margin-bottom:18px"><span>advancing</span><span>declining</span></div>
+        <div class="eyebrow" style="margin-bottom:10px">Sectors · leaders &amp; laggards</div>
+        <div class="bars">${show.map(x => `<div class="barrow"><span title="${esc(x.k)}">${esc(x.k)}</span><div class="bartrack"><i style="${x.c >= 0 ? 'left:50%' : 'right:50%'};width:${Math.abs(x.c) / maxAbs * 50}%;background:${x.c >= 0 ? 'var(--green)' : 'var(--red)'}"></i><i style="left:50%;width:1px;background:var(--mute);opacity:.5"></i></div><span class="${cls(x.c)}" style="text-align:right;font-weight:700">${x.c >= 0 ? '+' : ''}${fmt(x.c)}%</span></div>`).join('')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px">
+          <div><div class="eyebrow" style="margin-bottom:8px">Top gainers</div><div class="chips">${snap.gainers.slice(0, 6).map(s => `<span class="chip"><b>${esc(s.sym)}</b><span>+${fmt(s.chg)}%</span></span>`).join('')}</div></div>
+          <div><div class="eyebrow" style="margin-bottom:8px">Top losers</div><div class="chips">${snap.losers.slice(0, 6).map(s => `<span class="chip"><b>${esc(s.sym)}</b><span style="color:var(--red)">${fmt(s.chg)}%</span></span>`).join('')}</div></div>
+        </div>`;
+    }
+
+    // Before the first live trade: show the same rules replayed on real prices (clearly labeled).
+    const replay = !state.trades.length && !state.positions.length && report && report.curve?.length;
+    $('#modeBanner').classList.toggle('hidden', !replay);
+    if (replay) {
+      const firstScan = clock && clock.openTs > now ? new Date((clock.openTs + config.firstScanMin * 60) * 1000) : null;
+      const local = firstScan ? firstScan.toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : null;
+      $('#modeBanner').innerHTML = `<span style="font-size:20px">⏱</span><div><b>${clock?.isOpen ? 'The desk is live and waiting for its first fill at the next scan.' : 'Live trading starts ' + (local ? local + ' (09:40 IST)' : 'at the next 09:40 IST scan') + '.'}</b> Until the first live trade, the desk shows the same rules replayed over the last ${report.sessions} NSE sessions on real 5-minute prices, net of charges.</div>`;
+      const lastDay = report.to;
+      const dayTr = report.recent.filter(t => t.date === lastDay);
+      const dayP = dayTr.reduce((a, t) => a + t.pnl, 0);
+      const endEq = report.startCash + report.totalPnl;
+      $('#kEq').textContent = usd(endEq); $('#kEqS').textContent = `replay · paper capital ${usd(report.startCash, 0)}`;
+      $('#kDay').textContent = sgnUsd(dayP); $('#kDay').className = 'v ' + cls(dayP); $('#kDayS').textContent = `last session · ${dayTr.length} trades`;
+      $('#kTot').textContent = sgnUsd(report.totalPnl); $('#kTot').className = 'v ' + cls(report.totalPnl);
+      $('#kTotS').textContent = `${report.totalPct >= 0 ? '+' : ''}${fmt(report.totalPct)}% · net of ${usd(report.charges, 0)} charges`;
+      $('#kWin').textContent = fmt(report.winRate, 0) + '%'; $('#kWinS').textContent = `${report.wins} of ${report.trades} trades`;
+      $('#kOpen').textContent = `0/${config.maxPositions}`; $('#kOpenS').textContent = 'live from 09:40 IST';
+      $('#kDD').textContent = fmt(report.maxDDPct) + '%'; $('#kDDS').textContent = 'replay, peak to trough';
+      $('#eqRange').textContent = `replay · ${report.from} → ${report.to}`;
+      chart($('#eqWrap'), report.curve.map(c => ({ v: c.v, d: c.date })), { base: report.startCash, labels: p => p.d.slice(5) });
+      $('#histMeta').textContent = `replay · last ${report.recent.length} of ${report.trades}`;
+      $('#histBody').innerHTML = report.recent.map(t => `<tr>
+        <td><span class="sym">${esc(t.sym)}</span> <span class="tag rp">replay</span></td><td>${t.date.slice(5)}</td><td>${t.qty}</td><td>${usd(t.entry)}</td><td>${usd(t.exit)}</td>
+        <td class="${cls(t.r)}">${t.r > 0 ? '+' : ''}${fmt(t.r)}R</td><td style="color:var(--mute)">${usd(t.charges)}</td><td class="${cls(t.pnl)}"><b>${sgnUsd(t.pnl)}</b></td><td><span class="tag ${t.reason === 'target hit' ? 'g' : t.reason.includes('stop') ? 'r' : ''}">${esc(t.reason)}</span></td></tr>`).join('');
+      // feed: last replayed session, in alert format
+      const ev = [];
+      for (const t of dayTr) {
+        if (t.inTime) ev.push({ t: t.inTime, type: 'entry', text: `🟢 ${t.sym} entry filled\n${t.qty} shares @ ${usd(t.entry)} | Stop ${usd(t.stop)} | Risk ${usd((t.entry - t.stop) * t.qty, 0)} | BE at ${usd(t.be)}` });
+        ev.push({ t: t.time, type: 'exit', text: `${t.pnl >= 0 ? '🟢' : '🔴'} ${t.sym} ${t.reason} · ${t.qty} @ ${usd(t.exit)} | Net ${sgnUsd(t.pnl)} (${fmt(t.r)}R, charges ${usd(t.charges)})` });
+      }
+      ev.sort((a, b) => b.t - a.t);
+      const all = [...ev.map(e => ({ ...e, rp: true })), ...state.events];
+      $('#feedCount').textContent = all.length;
+      $('#feed').innerHTML = all.map(e => `<div class="msg ${e.type}">${esc(e.text)}<time>${e.rp ? 'replay · ' : ''}${etDay.format(e.t * 1000)} · ${etFmt.format(e.t * 1000)} IST</time></div>`).join('');
+    }
+
+    // rules
+    $('#rulesGrid').innerHTML = [
+      ['Universe', 'NIFTY 500', '501 symbols, every scan'],
+      ['First scan', '09:40 IST', `then every ${config.scanEveryMin} min`],
+      ['Gap filter', `+${config.minGapPct}%`, `opened ≥ +${config.minOpenGapPct}%, holding the open`],
+      ['Risk / trade', `${config.riskPct}%`, `of capital · max ${config.maxPositionPct}% per stock`],
+      ['Stop', `${config.stopMinPct}–${config.stopMaxPct}%`, 'under the day’s low'],
+      ['Breakeven', '+1R', `trail 1R after +2R`],
+      ['Target', `+${config.targetR}R`, `max ${config.maxPositions} open positions`],
+      ['Square-off', '15:20 IST', 'intraday, flat every day'],
+    ].map(([l, v, s]) => `<div class="rule"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+
+    $('#updated').textContent = 'updated ' + etFmt.format(Date.now()) + ' IST';
+  }
+
+  // ---- Connect · MCP
+  const MCP = location.origin + '/api/mcp';
+  const rpc = async (method, params) => (await fetch(MCP, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }) })).json();
+  const cfgText = JSON.stringify({ mcpServers: { 'nse-desk': { type: 'http', url: MCP } } }, null, 2);
+  $('#mcpUrl').textContent = MCP;
+  $('#mcpCfg').textContent = cfgText;
+  $('#mcpCurl').textContent = `curl -s ${MCP} \\\n  -H "Content-Type: application/json" \\\n  -H "Accept: application/json, text/event-stream" \\\n  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"market_status","arguments":{}}}'`;
+  const copy = (txt, btn) => { try { navigator.clipboard.writeText(txt); const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => btn.textContent = o, 1400); } catch {} };
+  $('#copyUrl').onclick = e => copy(MCP, e.target);
+  $('#copyCfg').onclick = e => copy(cfgText, e.target);
+  const SAMPLE = {
+    market_status: {}, get_quotes: { symbols: ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY'] }, scan_gappers: { limit: 10 }, top_movers: { direction: 'gainers', limit: 8 },
+    sector_performance: {}, get_history: { symbol: '^NSEI', range: '1mo', interval: '1d' }, search_symbol: { query: 'tata' },
+    intraday_charges: { buy_price: 2400, sell_price: 2450, quantity: 100 }, position_size: { entry: 2400, stop: 2340 }, desk_state: { trades: 5 }, strategy_report: {},
+  };
+  let toolsLoaded = false;
+  async function loadTools() {
+    if (toolsLoaded) return; toolsLoaded = true;
+    try {
+      const r = await rpc('tools/list', {});
+      const tools = r.result.tools;
+      $('#toolCount').textContent = tools.length + ' tools';
+      $('#toolList').innerHTML = tools.map(t => `<div class="tool"><b>${esc(t.name)}</b><p>${esc(t.description)}</p></div>`).join('');
+      $('#tryBtns').innerHTML = tools.map(t => `<button class="tab" data-tool="${esc(t.name)}">${esc(t.name)}</button>`).join('');
+      document.querySelectorAll('#tryBtns .tab').forEach(b => b.onclick = async () => {
+        document.querySelectorAll('#tryBtns .tab').forEach(x => x.classList.toggle('on', x === b));
+        const name = b.dataset.tool, args = SAMPLE[name] || {};
+        $('#tryOut').textContent = `→ tools/call ${name} ${JSON.stringify(args)}\n\nRunning…`;
+        const t0 = performance.now();
+        try {
+          const out = await rpc('tools/call', { name, arguments: args });
+          const data = out.result?.structuredContent ?? out.result ?? out;
+          let txt = JSON.stringify(data, null, 2);
+          if (txt.length > 12000) txt = txt.slice(0, 12000) + '\n…';
+          $('#tryOut').textContent = `→ tools/call ${name} ${JSON.stringify(args)}   (${Math.round(performance.now() - t0)} ms)\n\n${txt}`;
+        } catch (e) { $('#tryOut').textContent = 'Request failed: ' + e.message; }
+      });
+    } catch (e) { toolsLoaded = false; $('#toolList').innerHTML = '<div class="empty">Could not load the tool catalogue.</div>'; }
+  }
+
+  function ago(ts) {
+    const s = Math.max(0, Date.now() / 1000 - ts);
+    if (s < 90) return 'just now';
+    if (s < 3600) return Math.round(s / 60) + 'm ago';
+    if (s < 86400) return Math.round(s / 3600) + 'h ago';
+    return Math.round(s / 86400) + 'd ago';
+  }
+
+  async function loadReport() {
+    try {
+      const r = await fetch('/api/report');
+      report = await r.json();
+      if (report.error) throw new Error(report.error);
+      renderReport(report);
+    } catch (e) {
+      $('#rHead').textContent = 'Report unavailable right now';
+      $('#rSub').textContent = 'The market data source did not respond. Try again in a minute.';
+    }
+  }
+  function renderReport(r) {
+    $('#rSessions').textContent = r.sessions;
+    $('#rHead').innerHTML = `${r.wins} of ${r.trades} trades won.`;
+    $('#rSub').textContent = `${r.sessions} NSE sessions (${r.from} → ${r.to}), all ${r.universe} NIFTY 500 stocks on 5-minute data, same scans, sizing and exits as the live desk, net of ${usd(r.charges, 0)} in charges. Capital ${r.totalPct >= 0 ? 'up' : 'down'} ${fmt(Math.abs(r.totalPct))}%.`;
+    $('#rPnl').textContent = sgnUsd(r.totalPnl); $('#rPnl').className = 'v ' + cls(r.totalPnl);
+    $('#rPct').textContent = (r.totalPct >= 0 ? '+' : '') + fmt(r.totalPct) + '% on ' + usd(r.startCash, 0);
+    $('#rWin').textContent = fmt(r.winRate, 0) + '%'; $('#rWinS').textContent = `${r.wins} of ${r.trades}`;
+    $('#rTr').textContent = r.trades;
+    $('#rPf').textContent = r.profitFactor ?? '—';
+    $('#rAvg').textContent = usd(r.charges, 0);
+    $('#rDD').textContent = fmt(r.maxDDPct) + '%'; $('#rDDS').textContent = usd(r.maxDD, 0);
+    $('#rRange').textContent = `${r.from} → ${r.to}`;
+    chart($('#rEqWrap'), r.curve.map(c => ({ v: c.v, d: c.date })), { base: r.startCash, labels: p => p.d.slice(5) });
+    $('#rBody').innerHTML = r.recent.map(t => `<tr><td class="sym">${esc(t.sym)}</td><td>${t.date.slice(5)}</td><td class="pos">+${fmt(t.gap)}%</td><td>${t.qty}</td><td>${usd(t.entry)}</td><td>${usd(t.exit)}</td>
+      <td class="${cls(t.r)}">${t.r > 0 ? '+' : ''}${fmt(t.r)}R</td><td style="color:var(--mute)">${usd(t.charges)}</td><td class="${cls(t.pnl)}"><b>${sgnUsd(t.pnl)}</b></td><td><span class="tag ${t.reason === 'target hit' ? 'g' : t.reason.includes('stop') ? 'r' : ''}">${esc(t.reason)}</span></td></tr>`).join('');
+  }
+
+  setInterval(() => { $('#clockPill').textContent = etFmt.format(Date.now()) + ' IST'; }, 1000);
+  $('#clockPill').textContent = etFmt.format(Date.now()) + ' IST';
+  load();
+  setInterval(load, 20000);
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (last) render(last); if (report) renderReport(report); }, 150); });
+  try { const t = localStorage.getItem('tab'); if (t && t !== 'live') document.querySelector(`.tab[data-tab="${t}"]`)?.click(); } catch {}
+})();
+</script>
+</body>
+</html>

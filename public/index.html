@@ -361,7 +361,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
     const green = css.getPropertyValue('--green').trim(), red = css.getPropertyValue('--red').trim();
     const line = css.getPropertyValue('--line').trim(), mute = css.getPropertyValue('--mute').trim();
     if (!pts || pts.length < 2) { el.innerHTML = '<div class="chart-empty">The curve starts drawing with the first marked tick of a session.</div>'; return; }
-    const W = el.clientWidth || 700, H = 260, pl = 8, pr = 64, pt = 14, pb = 26;
+    const W = el.clientWidth || 700, H = 260, pl = 8, pr = 88, pt = 14, pb = 26;
     const vs = pts.map(p => p.v);
     let lo = Math.min(...vs, base ?? Infinity), hi = Math.max(...vs, base ?? -Infinity);
     const pad = (hi - lo) * 0.12 || hi * 0.01 || 1; lo -= pad; hi += pad;
@@ -375,7 +375,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
     for (let i = 0; i <= ticks; i++) {
       const v = lo + (hi - lo) * i / ticks, yy = y(v);
       grid += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="${line}" stroke-dasharray="2 4"/>` +
-        `<text x="${W - pr + 8}" y="${yy + 4}" fill="${mute}" font-size="11" font-family="JetBrains Mono">${Math.round(v).toLocaleString()}</text>`;
+        `<text x="${W - pr + 8}" y="${yy + 4}" fill="${mute}" font-size="11" font-family="JetBrains Mono">${Math.round(v).toLocaleString('en-IN')}</text>`;
     }
     let xl = '';
     const n = Math.min(5, pts.length);
@@ -390,7 +390,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       ${grid}${baseLine}<path d="${area}" fill="url(#g${el.id})"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"/>
       <circle cx="${x(pts.length - 1)}" cy="${y(lastV)}" r="4" fill="${col}"/>
       <rect x="${W - pr + 2}" y="${y(lastV) - 10}" width="${pr - 4}" height="20" rx="4" fill="${col}"/>
-      <text x="${W - pr + 6}" y="${y(lastV) + 4}" fill="#fff" font-size="11" font-weight="600" font-family="JetBrains Mono">${Math.round(lastV).toLocaleString()}</text>
+      <text x="${W - pr + 6}" y="${y(lastV) + 4}" fill="#fff" font-size="11" font-weight="600" font-family="JetBrains Mono">${Math.round(lastV).toLocaleString('en-IN')}</text>
       ${xl}<line id="hv${el.id}" y1="${pt}" y2="${H - pb}" stroke="${mute}" opacity="0"/></svg>`;
     const svg = el.querySelector('svg'), tip = $('#tip'), hv = el.querySelector('#hv' + el.id);
     svg.onmousemove = e => {
@@ -456,7 +456,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
     const wins = state.trades.filter(t => t.pnl > 0).length;
     let peak = -Infinity, dd = 0;
     for (const p of state.equity) { peak = Math.max(peak, p.v); dd = Math.max(dd, (peak - p.v) / peak * 100); }
-    $('#kEq').textContent = usd(eq);
+    $('#kEq').textContent = usd(eq, 0);
     $('#kEqS').textContent = `paper capital ${usd(state.startCash, 0)}`;
     $('#kDay').textContent = sgnUsd(dayP); $('#kDay').className = 'v ' + cls(dayP);
     $('#kDayS').textContent = `${tToday.length} closed today`;
@@ -472,7 +472,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
     const pts = [...state.equity];
     if (state.positions.length) pts.push({ t: now, v: eq });
     $('#eqRange').textContent = pts.length > 1 ? `${etDay.format(pts[0].t * 1000)} → now` : '';
-    chart($('#eqWrap'), pts, { base: state.startCash, labels: (p, full) => full ? etDay.format(p.t * 1000) + ' ' + etFmt.format(p.t * 1000) : etDay.format(p.t * 1000) });
+    chart($('#eqWrap'), pts, { base: state.startCash, labels: (p, full) => full ? etDay.format(p.t * 1000) + ' ' + etFmt.format(p.t * 1000) : (pts[pts.length - 1].t - pts[0].t < 86400 ? etFmt.format(p.t * 1000) : etDay.format(p.t * 1000)) });
 
     // positions
     $('#posBody').innerHTML = state.positions.length ? state.positions.map(p => {
@@ -542,7 +542,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display
       const dayTr = report.recent.filter(t => t.date === lastDay);
       const dayP = dayTr.reduce((a, t) => a + t.pnl, 0);
       const endEq = report.startCash + report.totalPnl;
-      $('#kEq').textContent = usd(endEq); $('#kEqS').textContent = `replay · paper capital ${usd(report.startCash, 0)}`;
+      $('#kEq').textContent = usd(endEq, 0); $('#kEqS').textContent = `replay · paper capital ${usd(report.startCash, 0)}`;
       $('#kDay').textContent = sgnUsd(dayP); $('#kDay').className = 'v ' + cls(dayP); $('#kDayS').textContent = `last session · ${dayTr.length} trades`;
       $('#kTot').textContent = sgnUsd(report.totalPnl); $('#kTot').className = 'v ' + cls(report.totalPnl);
       $('#kTotS').textContent = `${report.totalPct >= 0 ? '+' : ''}${fmt(report.totalPct)}% · net of ${usd(report.charges, 0)} charges`;

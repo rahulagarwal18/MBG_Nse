@@ -1,14 +1,16 @@
 // Read-only market snapshot: the gap filter on the latest NIFTY 500 quotes, plus movers and sector breadth.
 import { SYMBOLS, INFO } from '../lib/universe.js';
-import { getQuotes, istTime, istDate } from '../lib/market.js';
+import { getQuotes, istTime, istDate, getDataQuality } from '../lib/market.js';
 import { filterGappers } from '../lib/engine.js';
+import { nseCall, NSE_LIVE } from '../lib/nse.js';
 
 const r2 = n => Math.round(n * 100) / 100;
 
 export default async function handler(req, res) {
   try {
     const t0 = Date.now();
-    const quotes = await getQuotes(SYMBOLS);
+    const [quotes, vixR] = await Promise.all([getQuotes(SYMBOLS), nseCall(NSE_LIVE, 'cm_get_index_quote', { indexName: 'INDIA VIX' }, 8000).catch(() => null)]);
+    const vix = vixR?.index ? { last: vixR.index.last, chg: vixR.index.percChange } : null;
     const survivors = filterGappers(quotes);
     const asOf = Math.max(...Object.values(quotes).map(q => q.time || 0));
     const sorted = Object.entries(quotes).sort((a, b) => b[1].changePct - a[1].changePct);
@@ -23,7 +25,7 @@ export default async function handler(req, res) {
       gainers: sorted.slice(0, 8).map(([sym, q]) => ({ sym, chg: r2(q.changePct) })),
       losers: sorted.slice(-8).reverse().map(([sym, q]) => ({ sym, chg: r2(q.changePct) })),
       breadth: { adv: all.filter(q => q.changePct > 0).length, dec: all.filter(q => q.changePct < 0).length },
-      sectors, secs: Math.round((Date.now() - t0) / 100) / 10,
+      sectors, vix, quality: getDataQuality(), secs: Math.round((Date.now() - t0) / 100) / 10,
     });
   } catch (e) {
     return res.status(502).json({ error: String(e?.message || e) });

@@ -42,12 +42,13 @@
     const vs = items.map(i => i.v), hi = Math.max(0, ...vs), lo = Math.min(0, ...vs), span = (hi - lo) || 1;
     const y = v => pt + (1 - (v - lo) / span) * (H - pt - pb), y0 = y(0);
     const bw = (W - pl - pr) / items.length, gap = Math.min(6, bw * 0.25);
+    const barW = Math.min(bw - gap, 56); // a lone trade must not become one giant block
     const step = Math.ceil(items.length / 12);
     const out = items.map((it, i) => {
-      const x = pl + i * bw + gap / 2, top = Math.min(y(it.v), y0), h = Math.max(1.5, Math.abs(y(it.v) - y0));
+      const x = pl + i * bw + (bw - barW) / 2, top = Math.min(y(it.v), y0), h = Math.max(1.5, Math.abs(y(it.v) - y0));
       const col = colorOf ? colorOf(it) : it.v >= 0 ? C.g : C.r;
-      const lab = label && i % step === 0 ? `<text x="${x + (bw - gap) / 2}" y="${H - 10}" fill="${C.m}" font-size="10" ${F} text-anchor="middle">${esc(it.label)}</text>` : '';
-      return `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${(bw - gap).toFixed(1)}" height="${h.toFixed(1)}" rx="2" style="fill:${col}"><title>${esc((it.title || it.label) + ' · ' + fmtV(it.v))}</title></rect>${lab}`;
+      const lab = label && i % step === 0 ? `<text x="${x + barW / 2}" y="${H - 10}" fill="${C.m}" font-size="10" ${F} text-anchor="middle">${esc(it.label)}</text>` : '';
+      return `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="2" style="fill:${col}"><title>${esc((it.title || it.label) + ' · ' + fmtV(it.v))}</title></rect>${lab}`;
     }).join('');
     return `<svg class="vz" viewBox="0 0 ${W} ${H}" role="img"><line x1="${pl}" x2="${W - pr}" y1="${y0}" y2="${y0}" stroke="${C.m}" opacity=".6"/>${out}</svg>`;
   }
@@ -71,14 +72,13 @@
   function donut(segs, { center = '', sub = '' } = {}) {
     const tot = sum(segs.map(s => s.v));
     if (!tot) return empty('No data yet.', 170);
-    const R = 62, r = 40, cx = 80, cy = 80;
-    let a = -Math.PI / 2, paths = '';
+    // Ring drawn as stroked circles (pathLength 100), so a single 100% segment still shows its hole.
+    let off = 0, paths = '';
     for (const s of segs) {
       if (!s.v) continue;
-      const frac = s.v / tot, a2 = a + frac * Math.PI * 2 - (frac === 1 ? 0.0001 : 0), large = frac > 0.5 ? 1 : 0;
-      const p = (rad, ang) => `${(cx + rad * Math.cos(ang)).toFixed(2)},${(cy + rad * Math.sin(ang)).toFixed(2)}`;
-      paths += `<path d="M${p(R, a)}A${R},${R} 0 ${large} 1 ${p(R, a2)}L${p(r, a2)}A${r},${r} 0 ${large} 0 ${p(r, a)}Z" style="fill:${s.color}"><title>${esc(s.label)} · ${s.v} (${Math.round(frac * 100)}%)</title></path>`;
-      a = a2;
+      const frac = s.v / tot, len = frac * 100;
+      paths += `<circle cx="80" cy="80" r="51" fill="none" stroke-width="22" pathLength="100" style="stroke:${s.color}" stroke-dasharray="${len.toFixed(3)} ${(100 - len).toFixed(3)}" stroke-dashoffset="${(25 - off).toFixed(3)}"><title>${esc(s.label)} · ${s.v} (${Math.round(frac * 100)}%)</title></circle>`;
+      off += len;
     }
     const legend = segs.filter(s => s.v).map(s => `<div class="vz-leg"><i style="background:${s.color}"></i><span>${esc(s.label)}</span><b>${s.v}</b><em>${Math.round(s.v / tot * 100)}%</em></div>`).join('');
     return `<div class="vz-donut"><svg viewBox="0 0 160 160" class="vz-d" role="img">${paths}
@@ -150,11 +150,15 @@
     </div>`);
 
     // 2. Funnel + human decisions
-    const total = scanToday?.total ?? snap?.total ?? 0, passed = scanToday ? scanToday.count : snap?.count ?? 0;
+    const scansToday = (state.scans || []).filter(s => dayOf(s.t) === today);
     const proposed = decToday.length + pendToday.length, approved = decToday.filter(d => d.status === 'approved').length;
+    const total = scanToday?.total ?? snap?.total ?? 0;
+    // "Passed" = distinct stocks that passed any scan today (each scan lists its top survivors), never fewer than were proposed.
+    const passedSet = new Set(); for (const s of scansToday) for (const x of s.survivors || []) passedSet.add(x.sym);
+    const passed = scansToday.length ? Math.max(passedSet.size, ...scansToday.map(s => s.count || 0), proposed) : snap?.count ?? 0;
     const funnelBody = funnel([
       { label: `Scanned`, note: `every ${universe} stock`, v: total, color: C.a },
-      { label: 'Passed the filter', note: scanToday ? `gap-up rules · ${scanToday.label || hm(scanToday.t)}` : 'latest market snapshot', v: passed, color: C.a2 },
+      { label: 'Passed the filter', note: scansToday.length ? `gap-up rules · ${scansToday.length} scan${scansToday.length > 1 ? 's' : ''} today` : 'latest market snapshot', v: passed, color: C.a2 },
       { label: 'Proposed to a human', note: 'today', v: proposed, color: C.am },
       { label: 'Approved & bought', note: 'today', v: approved, color: C.g },
     ]) + `<div class="vz-cap">From ${total.toLocaleString()} stocks to a handful of trades. Nothing is bought until a person approves it.</div>`;
@@ -177,10 +181,11 @@
       }
       if (snap.sectors?.length) {
         const sec = snap.sectors.filter(s => s.n >= 3).slice(0, 14);
-        mk.push(card('Sectors today', 'average move', hbars(sec.map(s => ({ label: s.k, v: s.c })), { fmtV: v => pct(v, 2), labelW: 220 })));
+        const short = k => k.replace('Automobile and Auto Components', 'Auto').replace('Fast Moving Consumer Goods', 'FMCG').replace('Oil Gas & Consumable Fuels', 'Oil & Gas').replace('Media Entertainment & Publication', 'Media').replace('Information Technology', 'IT').replace('Construction Materials', 'Cement').replace('Financial Services', 'Financials').replace('Consumer Durables', 'Durables').replace('Consumer Services', 'Cons. services').replace('Metals & Mining', 'Metals').replace('Capital Goods', 'Cap. goods');
+        mk.push(card('Sectors today', 'average move', hbars(sec.map(s => ({ label: short(s.k), v: s.c })), { W: 430, rowH: 22, fmtV: v => pct(v, 2), labelW: 120 })));
       } else if (snap.movers?.length || snap.gainers?.length) {
         const mv = (snap.movers || snap.gainers).slice(0, 10);
-        mk.push(card('Biggest movers today', 'top gainers', hbars(mv.map(s => ({ label: s.sym, v: s.chg })), { fmtV: v => pct(v, 2), labelW: 90 })));
+        mk.push(card('Biggest movers today', 'top gainers', hbars(mv.map(s => ({ label: s.sym, v: s.chg })), { W: 430, rowH: 24, fmtV: v => pct(v, 2), labelW: 70 })));
       }
       if (mk.length) S.push(`<div class="vz-g2">${mk.join('')}</div>`);
     }
@@ -208,7 +213,7 @@
         <div class="vz-honest ${rep.totalPct < 0 ? 'neg' : 'pos'}"><b>${rep.totalPct < 0 ? 'The replay loses money.' : 'The replay is profitable.'}</b> ${pct(rep.totalPct, 2)} over ${rep.sessions} sessions (${money(rep.totalPnl, 0)} net of all charges) · ${Math.round(rep.winRate)}% of ${rep.trades} trades won · profit factor ${rep.profitFactor} · worst drop ${pct(-rep.maxDDPct, 1)}. Shown as is, not tuned.</div></div>`);
       S.push(card('Replay: account value over time', `${upDays} of ${daily.length} days ended up`, area(curve.map(c => ({ v: c.v, d: c.date })), { base: start, fmtV: m0, fmtX: p => p.d.slice(5) })));
       S.push(`<div class="vz-g2">${card('Replay: profit / loss per day', 'green = up day', bars(daily, { fmtV: v => (v >= 0 ? '+' : '') + money(v, 0), H: 210 }))}
-        ${card('Replay: drawdown', 'distance below the previous high', area(dd, { fmtV: v => v.toFixed(1) + '%', fmtX: p => p.d.slice(5), neg: true, base: 0 }))}</div>`);
+        ${card('Replay: drawdown', 'distance below the previous high', area(dd, { W: 430, H: 230, fmtV: v => v.toFixed(1) + '%', fmtX: p => p.d.slice(5), neg: true, base: 0 }))}</div>`);
       S.push(`<div class="vz-g2">${card('Replay: trade outcomes', `last ${recent.length} trades · in units of risk (R)`, bars(rLabs.map((l, i) => ({ label: l, v: rc[i], neg: i < 3 })), { fmtV: v => `${v} trades`, colorOf: it => it.neg ? C.r : C.g, H: 210 }) + '<div class="vz-cap">1R = the amount risked on a trade. −1R is a full stop-out; +3R is the profit target.</div>')}
         ${card('Replay: why trades closed', `last ${recent.length} trades`, donut(Object.entries(rr).map(([k, v]) => ({ label: k, v, color: reasonColor(k) })), { center: String(recent.length), sub: 'trades' }))}</div>`);
     }

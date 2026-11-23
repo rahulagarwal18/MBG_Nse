@@ -18,6 +18,10 @@ export default async function handler(req, res) {
     for (const [s, q] of Object.entries(quotes)) { const k = INFO[s]?.[1] || 'Other'; (by[k] ||= []).push(q.changePct); }
     const sectors = Object.entries(by).map(([k, l]) => ({ k, n: l.length, c: r2(l.reduce((a, b) => a + b, 0) / l.length) })).sort((a, b) => b.c - a.c);
     const all = Object.values(quotes);
+    // Day-change distribution for the overview chart: how many stocks fell / rose by how much.
+    const edges = [-3, -2, -1, 0, 1, 2, 3];
+    const dist = new Array(edges.length + 1).fill(0);
+    for (const q of all) { if (!Number.isFinite(q.changePct)) continue; let i = 0; while (i < edges.length && q.changePct >= edges[i]) i++; dist[i]++; }
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json({
       asOf, date: istDate(asOf), label: `${istTime(asOf)} IST`, total: all.length,
@@ -25,6 +29,7 @@ export default async function handler(req, res) {
       gainers: sorted.slice(0, 8).map(([sym, q]) => ({ sym, chg: r2(q.changePct) })),
       losers: sorted.slice(-8).reverse().map(([sym, q]) => ({ sym, chg: r2(q.changePct) })),
       breadth: { adv: all.filter(q => q.changePct > 0).length, dec: all.filter(q => q.changePct < 0).length },
+      dist: { edges, counts: dist },
       sectors, vix, quality: getDataQuality(), secs: Math.round((Date.now() - t0) / 100) / 10,
     });
   } catch (e) {

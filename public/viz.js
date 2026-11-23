@@ -61,10 +61,11 @@
     const rows = items.map((it, i) => {
       const yy = 4 + i * rowH, w = Math.abs(it.v) / maxAbs * span, x = it.v >= 0 ? x0 : x0 - w;
       const col = colorOf ? colorOf(it) : it.v >= 0 ? C.g : C.r;
-      const tx = it.v >= 0 ? x0 + w + 6 : x0 - w - 6;
+      // With negative bars, values sit in their own right-hand column so they never collide with the labels.
+      const tx = hasNeg ? W - 2 : x0 + w + 6, anchor = hasNeg ? 'end' : 'start';
       return `<text x="${labelW - 8}" y="${yy + rowH / 2 + 4}" fill="${C.ink2}" font-size="12" text-anchor="end">${esc(it.label)}</text>
         <rect x="${x.toFixed(1)}" y="${yy + 4}" width="${Math.max(2, w).toFixed(1)}" height="${rowH - 9}" rx="3" style="fill:${col}"><title>${esc(it.label + ' · ' + fmtV(it.v))}</title></rect>
-        <text x="${tx.toFixed(1)}" y="${yy + rowH / 2 + 4}" fill="${C.ink}" font-size="11" font-weight="600" ${F} text-anchor="${it.v >= 0 ? 'start' : 'end'}">${esc(fmtV(it.v))}</text>`;
+        <text x="${tx.toFixed(1)}" y="${yy + rowH / 2 + 4}" style="fill:${it.v >= 0 ? C.g : C.r}" font-size="11" font-weight="700" ${F} text-anchor="${anchor}">${esc(fmtV(it.v))}</text>`;
     }).join('');
     return `<svg class="vz" viewBox="0 0 ${W} ${H}" role="img">${hasNeg ? `<line x1="${x0}" x2="${x0}" y1="0" y2="${H}" stroke="${C.m}" opacity=".5"/>` : ''}${rows}</svg>`;
   }

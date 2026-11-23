@@ -736,7 +736,8 @@ dialog#pinDlg input[type=password]{width:100%;font:600 22px "JetBrains Mono",mon
     $('#rulesGrid').innerHTML = [
       ['Universe', 'NIFTY 500', '501 symbols, every scan'],
       ['First scan', '09:40 IST', `then every ${config.scanEveryMin} min`],
-      ['Gap filter', `+${config.minGapPct}%`, `opened ≥ +${config.minOpenGapPct}%, holding the open`],
+      ['Gap filter', `+${config.minGapPct}%`, `opened ≥ +${config.minOpenGapPct}%, holding the open${config.maxGapPct ? ` · skip gaps over ${config.maxGapPct}%` : ''}`],
+      ...(config.pullbackPct ? [['Entry', 'Buy the dip', `only once ≥ ${config.pullbackPct}% below the day’s high`]] : []),
       ['Risk / trade', `${config.riskPct}%`, `of capital · max ${config.maxPositionPct}% per stock`],
       ['Stop', `${config.stopMinPct}–${config.stopMaxPct}%`, 'under the day’s low'],
       ['Approval', 'Human', 'every buy needs a click · exits automatic'],

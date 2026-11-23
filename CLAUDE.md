@@ -27,7 +27,7 @@ MBG_Nse is the India desk of MultiBank Automated Trading. It is a gap-up momentu
 ## Key files
 | File | What it does |
 |---|---|
-| `lib/engine.js` | `CONFIG` (riskPct 1, maxPositions 5, minGapPct 2, minOpenGapPct 1, minPrice 50, flattenLastMin 10). `tick()` turns scan results into proposals in `state.pending`. `decide()` approves or rejects a proposal and re-checks the live price. Exits are automatic, with square-off by 15:20 IST. |
+| `lib/engine.js` | `CONFIG` (riskPct 1, maxPositions 5, minGapPct 2, minOpenGapPct 1, maxGapPct 6, pullbackPct 1, minPrice 50, flattenLastMin 10). Entries are "buy the dip": a gapper is only proposed once it is ≥ 1% below the day's high, and gaps over 6% are skipped (replay: −6.85% vs −9.46% for the old chase-the-high rules, 23 Nov 2026; still a loss). The `scan_gappers` MCP tool stays a plain gap scan without these two rules. `tick()` turns scan results into proposals in `state.pending`. `decide()` approves or rejects a proposal and re-checks the live price. Exits are automatic, with square-off by 15:20 IST. |
 | `lib/universe.js` | The NIFTY 500 symbols, plus an `INFO` map of symbol → [company, industry] |
 | `lib/analyze.js` | Stock report: 30-day metrics, a 5-day projection and a walk-forward accuracy check |
 | `lib/backtest.js` | Strategy replay, net of charges |

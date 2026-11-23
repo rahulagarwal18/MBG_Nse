@@ -1,0 +1,8 @@
+# Demo site: static dashboard only. /api/* is proxied to the main desk (see vercel.json),
+# so no server code, secrets or cron jobs are deployed here.
+api/
+lib/
+nse-desk/
+video/
+node_modules/
+.env*
